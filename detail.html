@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>建筑家详情 - 中国建筑科学家百科</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a href="search.html" class="back-btn">‹</a>
+  
+  <div class="container" id="detailContainer">
+    <div class="card">
+      <!-- 头部信息 -->
+      <div class="detail-header">
+        <div class="avatar-large">
+          <span class="avatar-text" id="avatarText">鲁</span>
+        </div>
+        <div class="header-info">
+          <div class="title" id="architectName">加载中...</div>
+          <div class="subtitle" id="architectSubtitle"></div>
+          <div class="years" id="architectYears"></div>
+        </div>
+      </div>
+
+      <!-- 收藏按钮 -->
+      <div class="favorite-section">
+        <div class="btn" id="favoriteBtn" onclick="toggleFav()">
+          🤍 收藏
+        </div>
+      </div>
+
+      <!-- 简介 -->
+      <div class="section">
+        <div class="section-title">人物简介</div>
+        <div class="section-content" id="architectSummary"></div>
+      </div>
+
+      <!-- 生平 -->
+      <div class="section">
+        <div class="section-title">生平事迹</div>
+        <div class="section-content" id="architectBiography"></div>
+      </div>
+
+      <!-- 代表作品 -->
+      <div class="section">
+        <div class="section-title">代表作品</div>
+        <div class="works-list" id="architectWorks"></div>
+      </div>
+
+      <!-- 建筑风格 -->
+      <div class="section">
+        <div class="section-title">建筑风格</div>
+        <div class="section-content" id="architectStyle"></div>
+      </div>
+
+      <!-- 历史贡献 -->
+      <div class="section">
+        <div class="section-title">历史贡献</div>
+        <div class="section-content" id="architectContribution"></div>
+      </div>
+
+      <!-- 名言 -->
+      <div class="quote-section" id="quoteSection" style="display:none">
+        <div class="corner-decoration top-left"></div>
+        <div class="corner-decoration top-right"></div>
+        <div class="corner-decoration bottom-left"></div>
+        <div class="corner-decoration bottom-right"></div>
+        <div class="quote-mark">"</div>
+        <div class="quote-text" id="architectQuote"></div>
+        <div class="quote-author" id="quoteAuthor"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部导航栏 -->
+  <div class="tab-bar">
+    <a href="index.html" class="tab-item">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-text">首页</span>
+    </a>
+    <a href="search.html" class="tab-item">
+      <span class="tab-icon">🔍</span>
+      <span class="tab-text">搜索</span>
+    </a>
+    <a href="favorites.html" class="tab-item">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-text">收藏</span>
+    </a>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    let currentArchitect = null;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const id = parseInt(getUrlParam('id'));
+      currentArchitect = architects.find(item => item.id === id);
+      
+      if (currentArchitect) {
+        renderDetail(currentArchitect);
+        updateFavoriteBtn();
+      } else {
+        document.getElementById('detailContainer').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">❓</div>
+            <div>未找到该建筑家</div>
+            <div class="empty-hint"><a href="search.html" style="color:#8B6914">返回搜索</a></div>
+          </div>
+        `;
+      }
+    });
+
+    function renderDetail(architect) {
+      document.title = architect.name + ' - 中国建筑科学家百科';
+      document.getElementById('avatarText').textContent = architect.name[0];
+      document.getElementById('architectName').textContent = architect.name;
+      document.getElementById('architectSubtitle').textContent = architect.dynasty + ' · ' + architect.title;
+      document.getElementById('architectYears').textContent = architect.years;
+      document.getElementById('architectSummary').textContent = architect.summary;
+      document.getElementById('architectBiography').textContent = architect.biography;
+      document.getElementById('architectStyle').textContent = architect.style;
+      document.getElementById('architectContribution').textContent = architect.contribution;
+      
+      // 作品列表
+      document.getElementById('architectWorks').innerHTML = architect.works.map(work => `
+        <div class="work-item">
+          <span class="work-dot">•</span>
+          <span class="work-name">${work}</span>
+        </div>
+      `).join('');
+      
+      // 名言
+      if (architect.quote) {
+        document.getElementById('quoteSection').style.display = 'block';
+        document.getElementById('architectQuote').textContent = architect.quote;
+        document.getElementById('quoteAuthor').textContent = '—— ' + architect.name;
+      }
+    }
+
+    function updateFavoriteBtn() {
+      const btn = document.getElementById('favoriteBtn');
+      if (isFavorite(currentArchitect.id)) {
+        btn.classList.add('btn-favorited');
+        btn.innerHTML = '❤️ 已收藏';
+      } else {
+        btn.classList.remove('btn-favorited');
+        btn.innerHTML = '🤍 收藏';
+      }
+    }
+
+    function toggleFav() {
+      toggleFavorite(currentArchitect.id);
+      updateFavoriteBtn();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>我的收藏 - 中国建筑科学家百科</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title-wrapper">
+        <h1 class="main-title">我的收藏</h1>
+        <p class="subtitle">已收藏的建筑家</p>
+      </div>
+    </div>
+
+    <div id="favoritesContainer">
+      <!-- 收藏列表 -->
+      <div class="architect-list" id="favoritesList"></div>
+      
+      <!-- 空状态 -->
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">⭐</div>
+        <div>暂无收藏</div>
+        <div class="empty-hint"><a href="search.html" style="color:#8B6914">去搜索感兴趣的建筑家</a></div>
+      </div>
+    </div>
+
+    <div style="padding: 20px; text-align: center;">
+      <a href="index.html" class="btn" style="display: inline-block; background: linear-gradient(135deg, #5D3A1A 0%, #8B4513 100%); color: white; padding: 10px 24px; border-radius: 20px; font-size: 14px;">
+        ‹ 返回首页
+      </a>
+    </div>
+  </div>
+
+  <!-- 底部导航栏 -->
+  <div class="tab-bar">
+    <a href="index.html" class="tab-item">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-text">首页</span>
+    </a>
+    <a href="search.html" class="tab-item">
+      <span class="tab-icon">🔍</span>
+      <span class="tab-text">搜索</span>
+    </a>
+    <a href="favorites.html" class="tab-item active">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-text">收藏</span>
+    </a>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderFavorites();
+    });
+
+    function renderFavorites() {
+      const favoriteIds = getFavorites();
+      const favoriteArchitects = architects.filter(a => favoriteIds.includes(a.id));
+      
+      if (favoriteArchitects.length > 0) {
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('favoritesList').innerHTML = favoriteArchitects.map(item => `
+          <a href="detail.html?id=${item.id}" class="card">
+            <div class="architect-header">
+              <div class="avatar-placeholder">
+                <span class="avatar-text">${item.name[0]}</span>
+              </div>
+              <div class="architect-info">
+                <div class="title">${item.name}</div>
+                <div class="subtitle">${item.dynasty} · ${item.title}</div>
+              </div>
+              <div class="favorite-btn" onclick="event.preventDefault(); removeFav(${item.id})">
+                ❤️
+              </div>
+            </div>
+            <div class="architect-summary">${item.summary}</div>
+          </a>
+        `).join('');
+      } else {
+        document.getElementById('favoritesList').innerHTML = '';
+        document.getElementById('emptyState').style.display = 'block';
+      }
+    }
+
+    function removeFav(id) {
+      removeFavorite(id);
+      renderFavorites();
+    }
+  </script>
+</body>
+</html>

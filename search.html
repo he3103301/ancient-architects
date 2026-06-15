@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>搜索建筑家 - 中国建筑科学家百科</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container search-page">
+    <!-- 搜索框 -->
+    <div class="search-input-wrapper">
+      <div class="search-input-box">
+        <span class="icon-search">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput"
+          placeholder="搜索名称、朝代、作品、建筑类型..."
+          oninput="onSearchInput()"
+        />
+        <span class="search-clear" id="clearBtn" style="display:none" onclick="clearKeyword()">✕</span>
+      </div>
+    </div>
+
+    <!-- 搜索结果模式 -->
+    <div id="searchResult" style="display:none">
+      <div class="result-count" id="resultCount"></div>
+      <div class="architect-list" id="resultList"></div>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">🔍</div>
+        <div>未找到相关结果</div>
+        <div class="empty-hint">试试其他关键词</div>
+      </div>
+    </div>
+
+    <!-- 全量列表模式 -->
+    <div id="listPage">
+      <!-- 热门搜索 -->
+      <div class="hot-search-inline">
+        <div class="hot-title">热门搜索</div>
+        <div class="hot-tags-row">
+          <span class="hot-tag-sm" onclick="searchHot('鲁班')">鲁班</span>
+          <span class="hot-tag-sm" onclick="searchHot('李诫')">李诫</span>
+          <span class="hot-tag-sm" onclick="searchHot('故宫')">故宫</span>
+          <span class="hot-tag-sm" onclick="searchHot('样式雷')">样式雷</span>
+          <span class="hot-tag-sm" onclick="searchHot('营造法式')">营造法式</span>
+          <span class="hot-tag-sm" onclick="searchHot('蒯祥')">蒯祥</span>
+          <span class="hot-tag-sm" onclick="searchHot('赵州桥')">赵州桥</span>
+          <span class="hot-tag-sm" onclick="searchHot('圆明园')">圆明园</span>
+        </div>
+      </div>
+
+      <div class="list-header">
+        <h2 class="list-title">全部建筑家</h2>
+        <span class="list-count" id="totalCount">目前百科已收录 0 位</span>
+      </div>
+
+      <!-- 朝代筛选 -->
+      <div class="dynasty-filter">
+        <span class="dynasty-tag active" onclick="filterByDynasty('')">全部</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('春秋')">春秋</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('战国')">战国</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('秦')">秦</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('汉')">汉</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('三国')">三国</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('南北朝')">南北朝</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('隋')">隋</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('唐')">唐</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('五代')">五代</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('宋')">宋</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('元')">元</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('明')">明</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('清')">清</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('现代')">现代</span>
+        <span class="dynasty-tag" onclick="filterByDynasty('当代')">当代</span>
+      </div>
+
+      <!-- 建筑家列表 -->
+      <div class="architect-list" id="architectList"></div>
+    </div>
+  </div>
+
+  <!-- 底部导航栏 -->
+  <div class="tab-bar">
+    <a href="index.html" class="tab-item">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-text">首页</span>
+    </a>
+    <a href="search.html" class="tab-item active">
+      <span class="tab-icon">🔍</span>
+      <span class="tab-text">搜索</span>
+    </a>
+    <a href="favorites.html" class="tab-item">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-text">收藏</span>
+    </a>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    let currentDynasty = '';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('totalCount').textContent = '目前百科已收录 ' + architects.length + ' 位';
+      renderList(architects);
+    });
+
+    function onSearchInput() {
+      const keyword = document.getElementById('searchInput').value;
+      const clearBtn = document.getElementById('clearBtn');
+      
+      if (keyword) {
+        clearBtn.style.display = 'block';
+        doSearch(keyword);
+      } else {
+        clearBtn.style.display = 'none';
+        showListPage();
+      }
+    }
+
+    function doSearch(keyword) {
+      const results = searchArchitects(keyword);
+      document.getElementById('searchResult').style.display = 'block';
+      document.getElementById('listPage').style.display = 'none';
+      
+      if (results.length > 0) {
+        document.getElementById('resultCount').textContent = '找到 ' + results.length + ' 个相关结果';
+        document.getElementById('resultCount').style.display = 'block';
+        document.getElementById('emptyState').style.display = 'none';
+        renderArchitectList(results, 'resultList');
+      } else {
+        document.getElementById('resultCount').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('resultList').innerHTML = '';
+      }
+    }
+
+    function showListPage() {
+      document.getElementById('searchResult').style.display = 'none';
+      document.getElementById('listPage').style.display = 'block';
+      renderList(architects);
+    }
+
+    function clearKeyword() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearBtn').style.display = 'none';
+      showListPage();
+    }
+
+    function searchHot(keyword) {
+      document.getElementById('searchInput').value = keyword;
+      document.getElementById('clearBtn').style.display = 'block';
+      doSearch(keyword);
+    }
+
+    function filterByDynasty(dynasty) {
+      currentDynasty = dynasty;
+      
+      // 更新标签样式
+      document.querySelectorAll('.dynasty-tag').forEach(tag => {
+        tag.classList.remove('active');
+        if (tag.textContent === (dynasty || '全部')) {
+          tag.classList.add('active');
+        }
+      });
+      
+      const filtered = filterByDynasty ? architects.filter(a => a.dynasty === dynasty) : architects;
+      renderList(filtered);
+    }
+
+    function renderList(list) {
+      renderArchitectList(list, 'architectList');
+    }
+
+    function renderArchitectList(list, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = list.map(item => `
+        <a href="detail.html?id=${item.id}" class="card">
+          <div class="architect-header">
+            <div class="avatar-placeholder">
+              <span class="avatar-text">${item.name[0]}</span>
+            </div>
+            <div class="architect-info">
+              <div class="title">${item.name}</div>
+              <div class="subtitle">${item.dynasty} · ${item.title}</div>
+            </div>
+            <div class="favorite-btn" onclick="event.preventDefault(); toggleFav(${item.id})">
+              ${isFavorite(item.id) ? '❤️' : '🤍'}
+            </div>
+          </div>
+          <div class="architect-summary">${item.summary}</div>
+          <div class="architect-tags">
+            ${item.works.slice(0, 3).map(work => `<span class="tag">${work}</span>`).join('')}
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function toggleFav(id) {
+      toggleFavorite(id);
+      // 重新渲染当前列表
+      if (document.getElementById('searchResult').style.display === 'none') {
+        const filtered = currentDynasty ? architects.filter(a => a.dynasty === currentDynasty) : architects;
+        renderList(filtered);
+      } else {
+        const keyword = document.getElementById('searchInput').value;
+        doSearch(keyword);
+      }
+    }
+  </script>
+</body>
+</html>
