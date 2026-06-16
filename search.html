@@ -106,6 +106,38 @@
 
   <script src="js/data.js"></script>
   <script>
+    function getFavorites() {
+      const favs = localStorage.getItem('favorites');
+      return favs ? JSON.parse(favs) : [];
+    }
+    
+    function isFavorite(id) {
+      const favs = getFavorites();
+      return favs.includes(id);
+    }
+    
+    function toggleFavorite(id) {
+      const favs = getFavorites();
+      const index = favs.indexOf(id);
+      if (index > -1) {
+        favs.splice(index, 1);
+      } else {
+        favs.push(id);
+      }
+      localStorage.setItem('favorites', JSON.stringify(favs));
+    }
+    
+    function searchArchitects(keyword) {
+      const kw = keyword;
+      return architects.filter(item => {
+        return item.name.includes(kw) ||
+               item.dynasty.includes(kw) ||
+               item.title.includes(kw) ||
+               item.summary.includes(kw) ||
+               item.works.some(work => work.includes(kw));
+      });
+    }
+    
     let currentDynasty = '';
     
     document.addEventListener('DOMContentLoaded', function() {

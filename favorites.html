@@ -60,6 +60,20 @@
 
   <script src="js/data.js"></script>
   <script>
+    function getFavorites() {
+      const favs = localStorage.getItem('favorites');
+      return favs ? JSON.parse(favs) : [];
+    }
+    
+    function removeFavorite(id) {
+      const favs = getFavorites();
+      const index = favs.indexOf(id);
+      if (index > -1) {
+        favs.splice(index, 1);
+      }
+      localStorage.setItem('favorites', JSON.stringify(favs));
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
       renderFavorites();
     });
