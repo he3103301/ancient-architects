@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>考研学习 - 中国建筑科学家百科</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .study-container {
+      padding: 20px;
+      padding-bottom: 120px;
+    }
+
+    .study-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .study-header h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .study-header p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .study-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .study-tab {
+      padding: 12px 24px;
+      background: #fff;
+      border-radius: 24px;
+      font-size: 14px;
+      color: #666;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .study-tab.active {
+      background: #0f3460;
+      color: #fff;
+    }
+
+    .study-content {
+      display: none;
+    }
+
+    .study-content.active {
+      display: block;
+    }
+
+    /* 速记卡片 */
+    .flashcard-container {
+      perspective: 1000px;
+      margin-bottom: 20px;
+    }
+
+    .flashcard {
+      width: 100%;
+      height: 280px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      cursor: pointer;
+    }
+
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .flashcard-front {
+      background: linear-gradient(135deg, #0f3460, #1a1a2e);
+      color: #fff;
+    }
+
+    .flashcard-back {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: #fff;
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-category {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 16px;
+      padding: 4px 12px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+    }
+
+    .flashcard-name {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .flashcard-hint {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .flashcard-title {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 16px;
+    }
+
+    .flashcard-desc {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .flashcard-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .flashcard-counter {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .flashcard-btn {
+      padding: 12px 24px;
+      background: #0f3460;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .flashcard-btn:hover {
+      background: #1a1a2e;
+    }
+
+    .flashcard-btn.prev { background: #999; }
+    .flashcard-btn.next { background: #0f3460; }
+
+    /* 题库 */
+    .quiz-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .quiz-number {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .quiz-question {
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      padding: 16px;
+      background: #f5f5f5;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .quiz-option:hover {
+      background: #e8e8e8;
+    }
+
+    .quiz-option.selected {
+      border-color: #0f3460;
+      background: rgba(15, 52, 96, 0.1);
+    }
+
+    .quiz-option.correct {
+      border-color: #27ae60;
+      background: rgba(39, 174, 96, 0.1);
+    }
+
+    .quiz-option.wrong {
+      border-color: #e74c3c;
+      background: rgba(231, 76, 60, 0.1);
+    }
+
+    .quiz-result {
+      display: none;
+      margin-top: 16px;
+      padding: 16px;
+      background: #f0f8ff;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .quiz-result.show {
+      display: block;
+    }
+
+    .quiz-submit {
+      width: 100%;
+      padding: 16px;
+      background: #0f3460;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s;
+    }
+
+    .quiz-submit:hover {
+      background: #1a1a2e;
+    }
+
+    .quiz-progress {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ddd;
+    }
+
+    .progress-dot.active {
+      background: #0f3460;
+    }
+
+    .progress-dot.completed {
+      background: #27ae60;
+    }
+
+    /* 学习统计 */
+    .study-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .study-stat {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .study-stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f3460;
+    }
+
+    .study-stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="study-container">
+      <!-- 页面标题 -->
+      <div class="study-header">
+        <h1>📖 考研学习</h1>
+        <p>速记卡片 + 题库练习</p>
+      </div>
+
+      <!-- 学习统计 -->
+      <div class="study-stats">
+        <div class="study-stat">
+          <div class="study-stat-number" id="cardCount">0</div>
+          <div class="study-stat-label">速记卡片</div>
+        </div>
+        <div class="study-stat">
+          <div class="study-stat-number" id="quizCount">0</div>
+          <div class="study-stat-label">题目数量</div>
+        </div>
+        <div class="study-stat">
+          <div class="study-stat-number" id="doneCount">0</div>
+          <div class="study-stat-label">已完成</div>
+        </div>
+      </div>
+
+      <!-- 学习模式切换 -->
+      <div class="study-tabs">
+        <div class="study-tab active" data-mode="flashcard">🎴 速记卡片</div>
+        <div class="study-tab" data-mode="quiz">📝 题库练习</div>
+      </div>
+
+      <!-- 速记卡片模式 -->
+      <div class="study-content active" id="flashcardMode">
+        <div class="flashcard-container">
+          <div class="flashcard" id="flashcard">
+            <div class="flashcard-face flashcard-front">
+              <div class="flashcard-category" id="cardCategory">唐代</div>
+              <div class="flashcard-name" id="cardName">阎立德</div>
+              <div class="flashcard-hint">点击卡片查看详情</div>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <div class="flashcard-title" id="cardTitle">主要成就</div>
+              <div class="flashcard-desc" id="cardDesc">主持设计大明宫、翠微宫等唐代重要建筑</div>
+            </div>
+          </div>
+        </div>
+        <div class="flashcard-nav">
+          <button class="flashcard-btn prev" onclick="prevCard()">← 上一张</button>
+          <span class="flashcard-counter"><span id="currentIndex">1</span> / <span id="totalCards">10</span></span>
+          <button class="flashcard-btn next" onclick="nextCard()">下一张 →</button>
+        </div>
+      </div>
+
+      <!-- 题库模式 -->
+      <div class="study-content" id="quizMode">
+        <div class="quiz-progress" id="quizProgress"></div>
+        <div id="quizContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部导航栏 -->
+  <div class="tab-bar">
+    <a href="index.html" class="tab-item">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-text">首页</span>
+    </a>
+    <a href="search.html" class="tab-item">
+      <span class="tab-icon">🔍</span>
+      <span class="tab-text">搜索</span>
+    </a>
+    <a href="map.html" class="tab-item">
+      <span class="tab-icon">🗺️</span>
+      <span class="tab-text">地图</span>
+    </a>
+    <a href="relationship.html" class="tab-item">
+      <span class="tab-icon">🔗</span>
+      <span class="tab-text">图谱</span>
+    </a>
+    <a href="favorites.html" class="tab-item">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-text">收藏</span>
+    </a>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    // 速记卡片数据
+    const flashcards = [
+      { category: '春秋', name: '鲁班', title: '建筑工匠之祖', desc: '春秋时期鲁国人，发明攻城云梯、木工工具等，被尊为"百工圣祖"' },
+      { category: '战国', name: '李冰', title: '都江堰创建者', desc: '战国时期水利专家，主持修建都江堰，创造性地解决了江水分流、排沙等难题' },
+      { category: '秦', name: '蒙恬', title: '长城修建者', desc: '秦朝名将，主持修建万里长城，发明毛笔' },
+      { category: '汉', name: '张衡', title: '天文学家', desc: '东汉科学家，发明地动仪、浑天仪，在天文学、机械学等方面有杰出贡献' },
+      { category: '隋', name: '宇文恺', title: '城市规划专家', desc: '隋代建筑家，主持修建大兴城（今西安），设计布局合理的城市格局' },
+      { category: '隋', name: '李春', title: '桥梁专家', desc: '隋代工匠，主持建造赵州桥，是世界上现存最早、保存最完好的敞肩石拱桥' },
+      { category: '唐', name: '阎立德', title: '唐代建筑大师', desc: '唐代画家、建筑师，主持设计大明宫、翠微宫等重要建筑' },
+      { category: '北宋', name: '李诫', title: '《营造法式》作者', desc: '北宋建筑学家，编撰《营造法式》，是中国古代最完整的建筑技术专著' },
+      { category: '元', name: '郭守敬', title: '天文学家', desc: '元代科学家，建造登封观星台，编制《授时历》，在天文历法方面有重要贡献' },
+      { category: '明', name: '蒯祥', title: '故宫设计者', desc: '明代著名工匠，被誉为"蒯鲁班"，主持建造故宫和天安门' },
+      { category: '明', name: '计成', title: '园林学家', desc: '明代造园家，著有《园冶》，是中国古代园林理论的奠基之作' },
+      { category: '清', name: '样式雷', title: '皇家建筑世家', desc: '雷发达家族七代主持清代皇家建筑，包括圆明园、颐和园、承德避暑山庄等' },
+      { category: '现代', name: '梁思成', title: '中国建筑史学家', desc: '中国建筑史学的奠基人，编写《中国建筑史》，保护古建筑' },
+      { category: '现代', name: '林徽因', title: '建筑师、诗人', desc: '著名建筑师，参与设计人民英雄纪念碑，在建筑和文学方面都有杰出贡献' }
+    ];
+
+    // 题库数据
+    const quizzes = [
+      {
+        question: '被誉为"百工圣祖"的春秋时期工匠是？',
+        options: ['鲁班', '墨子', '张衡', '李冰'],
+        answer: 0,
+        explanation: '鲁班，春秋时期鲁国人，被尊为"百工圣祖"，发明了攻城云梯、锯子等多种工具。'
+      },
+      {
+        question: '主持修建都江堰的水利专家是？',
+        options: ['李冰', '郑国', '西门豹', '白起'],
+        answer: 0,
+        explanation: '战国时期，李冰父子主持修建都江堰，创造了世界水利史上的奇迹。'
+      },
+      {
+        question: '《营造法式》的作者是？',
+        options: ['李诫', '计成', '喻皓', '蒯祥'],
+        answer: 0,
+        explanation: '北宋李诫编撰《营造法式》，是中国古代最完整的建筑技术专著。'
+      },
+      {
+        question: '主持设计故宫和天安门的明代工匠是？',
+        options: ['蒯祥', '沈德潜', '姚承祖', '文震亨'],
+        answer: 0,
+        explanation: '蒯祥是明代著名工匠，被誉为"蒯鲁班"，主持建造了故宫和天安门。'
+      },
+      {
+        question: '"样式雷"指的是哪个建筑家族？',
+        options: ['雷发达家族', '蒯祥家族', '计成家族', '李诫家族'],
+        answer: 0,
+        explanation: '样式雷是指雷发达家族，七代主持清代皇家建筑工程。'
+      },
+      {
+        question: '著有《园冶》的明代造园家是？',
+        options: ['计成', '文震亨', '李渔', '张涟'],
+        answer: 0,
+        explanation: '计成是明代造园家，著有《园冶》，是中国古代园林理论的奠基之作。'
+      },
+      {
+        question: '建造赵州桥的隋代工匠是？',
+        options: ['李春', '宇文恺', '李密', '杨坚'],
+        answer: 0,
+        explanation: '李春是隋代工匠，主持建造赵州桥，是世界上现存最早的敞肩石拱桥。'
+      },
+      {
+        question: '中国建筑史学的奠基人是？',
+        options: ['梁思成', '刘敦桢', '杨廷宝', '梁思永'],
+        answer: 0,
+        explanation: '梁思成是中国建筑史学的奠基人，编写了《中国建筑史》。'
+      },
+      {
+        question: '主持修建隋代大兴城的建筑师是？',
+        options: ['宇文恺', '杨坚', '高颎', '贺若弼'],
+        answer: 0,
+        explanation: '宇文恺是隋代建筑家，主持修建大兴城，设计了合理的城市布局。'
+      },
+      {
+        question: '元代主持建造登封观星台的天文学家是？',
+        options: ['郭守敬', '张衡', '祖冲之', '一行'],
+        answer: 0,
+        explanation: '郭守敬是元代科学家，建造登封观星台，编制《授时历》。'
+      }
+    ];
+
+    // 当前卡片索引
+    let currentCardIndex = 0;
+
+    // 初始化速记卡片
+    function initFlashcards() {
+      document.getElementById('cardCount').textContent = flashcards.length;
+      document.getElementById('totalCards').textContent = flashcards.length;
+      updateFlashcard();
+    }
+
+    function updateFlashcard() {
+      const card = flashcards[currentCardIndex];
+      document.getElementById('cardCategory').textContent = card.category;
+      document.getElementById('cardName').textContent = card.name;
+      document.getElementById('cardTitle').textContent = card.title;
+      document.getElementById('cardDesc').textContent = card.desc;
+      document.getElementById('currentIndex').textContent = currentCardIndex + 1;
+      document.getElementById('flashcard').classList.remove('flipped');
+    }
+
+    function prevCard() {
+      currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+      updateFlashcard();
+    }
+
+    function nextCard() {
+      currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+      updateFlashcard();
+    }
+
+    // 卡片翻转
+    document.getElementById('flashcard').addEventListener('click', function() {
+      this.classList.toggle('flipped');
+    });
+
+    // 初始化题库
+    let currentQuizIndex = 0;
+    let selectedAnswers = {};
+
+    function initQuizzes() {
+      document.getElementById('quizCount').textContent = quizzes.length;
+      renderQuizProgress();
+      renderQuiz();
+    }
+
+    function renderQuizProgress() {
+      const container = document.getElementById('quizProgress');
+      container.innerHTML = quizzes.map((_, i) => 
+        `<div class="progress-dot ${i === 0 ? 'active' : ''}"></div>`
+      ).join('');
+    }
+
+    function renderQuiz() {
+      const quiz = quizzes[currentQuizIndex];
+      const container = document.getElementById('quizContainer');
+      
+      container.innerHTML = `
+        <div class="quiz-card">
+          <div class="quiz-number">第 ${currentQuizIndex + 1} 题</div>
+          <div class="quiz-question">${quiz.question}</div>
+          <div class="quiz-options">
+            ${quiz.options.map((opt, i) => `
+              <div class="quiz-option" data-index="${i}" onclick="selectOption(${i})">${opt}</div>
+            `).join('')}
+          </div>
+          <div class="quiz-result" id="quizResult">
+            <strong>答案解析：</strong><br>
+            ${quiz.explanation}
+          </div>
+          <button class="quiz-submit" onclick="submitAnswer()">提交答案</button>
+          <button class="quiz-submit" style="background: #27ae60; margin-top: 10px; display: none;" id="nextQuizBtn" onclick="nextQuiz()">下一题</button>
+        </div>
+      `;
+    }
+
+    function selectOption(index) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach((opt, i) => {
+        opt.classList.remove('selected');
+        if (i === index) opt.classList.add('selected');
+      });
+      selectedAnswers[currentQuizIndex] = index;
+    }
+
+    function submitAnswer() {
+      const quiz = quizzes[currentQuizIndex];
+      const selected = selectedAnswers[currentQuizIndex];
+      const options = document.querySelectorAll('.quiz-option');
+      
+      if (selected === undefined) {
+        alert('请选择一个答案');
+        return;
+      }
+
+      options.forEach((opt, i) => {
+        opt.style.pointerEvents = 'none';
+        if (i === quiz.answer) {
+          opt.classList.add('correct');
+        } else if (i === selected && selected !== quiz.answer) {
+          opt.classList.add('wrong');
+        }
+      });
+
+      document.getElementById('quizResult').classList.add('show');
+      document.querySelector('.quiz-submit').style.display = 'none';
+      document.getElementById('nextQuizBtn').style.display = 'block';
+
+      // 更新进度
+      const dots = document.querySelectorAll('.progress-dot');
+      dots[currentQuizIndex].classList.remove('active');
+      dots[currentQuizIndex].classList.add('completed');
+
+      // 更新统计
+      document.getElementById('doneCount').textContent = Object.keys(selectedAnswers).length;
+    }
+
+    function nextQuiz() {
+      if (currentQuizIndex < quizzes.length - 1) {
+        currentQuizIndex++;
+        renderQuizProgress();
+        renderQuiz();
+        
+        // 更新当前进度
+        const dots = document.querySelectorAll('.progress-dot');
+        dots[currentQuizIndex].classList.add('active');
+      } else {
+        // 全部完成
+        alert(`恭喜完成全部题目！\n正确率：${calculateScore()}/${quizzes.length}`);
+      }
+    }
+
+    function calculateScore() {
+      let score = 0;
+      quizzes.forEach((quiz, i) => {
+        if (selectedAnswers[i] === quiz.answer) score++;
+      });
+      return score;
+    }
+
+    // 模式切换
+    document.querySelectorAll('.study-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.study-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.study-content').forEach(c => c.classList.remove('active'));
+        
+        this.classList.add('active');
+        const mode = this.dataset.mode;
+        document.getElementById(mode + 'Mode').classList.add('active');
+      });
+    });
+
+    // 初始化
+    initFlashcards();
+    initQuizzes();
+  </script>
+</body>
+</html>

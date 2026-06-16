@@ -5,8 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>中国建筑科学家百科</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* 登录页面样式 */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .login-overlay.hidden {
+      display: none;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 48px 32px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 32px;
+    }
+
+    .login-input-group {
+      margin-bottom: 20px;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: #0f3460;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #0f3460, #1a1a2e);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(15, 52, 96, 0.3);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-error {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .login-error.show {
+      display: block;
+    }
+
+    .login-hint {
+      margin-top: 24px;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
 </head>
 <body>
+  <!-- 登录页面 -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-icon">🏛️</div>
+      <h1 class="login-title">中国建筑科学家百科</h1>
+      <p class="login-subtitle">探索千年建筑智慧</p>
+      <form id="loginForm">
+        <div class="login-input-group">
+          <input type="password" class="login-input" id="passwordInput" placeholder="请输入访问密码" required>
+        </div>
+        <button type="submit" class="login-btn">进入百科</button>
+      </form>
+      <p class="login-error" id="loginError">密码错误，请重新输入</p>
+      <p class="login-hint">密码：architect</p>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
   <div class="container">
     <!-- 页面标题 -->
     <div class="header">
@@ -68,7 +191,7 @@
     <!-- 功能入口 -->
     <div class="entry-section">
       <a href="search.html" class="entry-card">
-        <div class="entry-icon">📚</div>
+        <div class="entry-icon">🔍</div>
         <div class="entry-info">
           <div class="entry-title">搜索建筑家</div>
           <div class="entry-desc">查找感兴趣的古代建筑科学家</div>
@@ -76,11 +199,47 @@
         <span class="entry-arrow">›</span>
       </a>
 
-      <a href="favorites.html" class="entry-card">
-        <div class="entry-icon">⭐</div>
+      <a href="map.html" class="entry-card">
+        <div class="entry-icon">🗺️</div>
         <div class="entry-info">
-          <div class="entry-title">我的收藏</div>
-          <div class="entry-desc">查看已收藏的建筑家</div>
+          <div class="entry-title">项目地图</div>
+          <div class="entry-desc">探索建筑家的足迹分布</div>
+        </div>
+        <span class="entry-arrow">›</span>
+      </a>
+
+      <a href="relationship.html" class="entry-card">
+        <div class="entry-icon">🔗</div>
+        <div class="entry-info">
+          <div class="entry-title">师承图谱</div>
+          <div class="entry-desc">了解建筑家的师承关系</div>
+        </div>
+        <span class="entry-arrow">›</span>
+      </a>
+
+      <a href="study.html" class="entry-card">
+        <div class="entry-icon">📖</div>
+        <div class="entry-info">
+          <div class="entry-title">考研学习</div>
+          <div class="entry-desc">速记卡片和题库练习</div>
+        </div>
+        <span class="entry-arrow">›</span>
+      </a>
+
+      <a href="gallery.html" class="entry-card">
+        <div class="entry-icon">🖼️</div>
+        <div class="entry-info">
+          <div class="entry-title">高清图集</div>
+          <div class="entry-desc">欣赏古代建筑之美</div>
+        </div>
+        <span class="entry-arrow">›</span>
+      </a>
+
+      <a href="contribute.html" class="entry-card">
+        <div class="entry-icon">✍️</div>
+        <div class="entry-info">
+          <div class="entry-title">用户投稿</div>
+          <div class="entry-desc">一起完善百科内容</div>
         </div>
         <span class="entry-arrow">›</span>
       </a>
@@ -111,8 +270,35 @@
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script>
+    // 登录验证
+    const LOGIN_PASSWORD = 'architect'; // 可以修改为其他密码
+
+    function checkLogin() {
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      if (isLoggedIn === 'true') {
+        document.getElementById('loginOverlay').classList.add('hidden');
+      } else {
+        document.getElementById('loginOverlay').classList.remove('hidden');
+      }
+    }
+
+    // 登录表单提交
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const password = document.getElementById('passwordInput').value;
+      if (password === LOGIN_PASSWORD) {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        document.getElementById('loginOverlay').classList.add('hidden');
+      } else {
+        document.getElementById('loginError').classList.add('show');
+        document.getElementById('passwordInput').value = '';
+      }
+    });
+
     // 初始化首页数据
     document.addEventListener('DOMContentLoaded', function() {
+      checkLogin();
+      
       document.getElementById('architectCount').textContent = architects.length;
       
       const recommendList = document.getElementById('recommendList');

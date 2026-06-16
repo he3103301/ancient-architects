@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>高清图集 - 中国建筑科学家百科</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .gallery-container {
+      padding: 20px;
+      padding-bottom: 120px;
+    }
+
+    .gallery-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .gallery-header h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .gallery-header p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .gallery-intro {
+      background: linear-gradient(135deg, #0f3460, #1a1a2e);
+      color: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    .gallery-intro h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .gallery-intro p {
+      font-size: 14px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .download-section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .download-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #0f3460;
+    }
+
+    .download-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #27ae60, #2ecc71);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+    }
+
+    .download-btn:active {
+      transform: translateY(0);
+    }
+
+    .download-size {
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+      margin-top: 8px;
+    }
+
+    /* 图集分类 */
+    .gallery-categories {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .category-btn {
+      padding: 10px 20px;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 24px;
+      font-size: 14px;
+      color: #666;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .category-btn.active {
+      background: #0f3460;
+      color: #fff;
+      border-color: #0f3460;
+    }
+
+    /* 图集网格 */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .gallery-item {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .gallery-image {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: #fff;
+      position: relative;
+    }
+
+    .gallery-image::after {
+      content: '🔍';
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .gallery-item:hover .gallery-image::after {
+      opacity: 1;
+    }
+
+    .gallery-info {
+      padding: 12px;
+    }
+
+    .gallery-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gallery-meta {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .gallery-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      font-size: 10px;
+      color: #666;
+      margin-right: 4px;
+    }
+
+    /* 预览弹窗 */
+    .preview-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 9999;
+      flex-direction: column;
+    }
+
+    .preview-modal.show {
+      display: flex;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      color: #fff;
+    }
+
+    .preview-title {
+      font-size: 16px;
+    }
+
+    .preview-close {
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0 8px;
+    }
+
+    .preview-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .preview-placeholder {
+      width: 100%;
+      max-width: 400px;
+      height: 300px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .preview-placeholder-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .preview-placeholder-text {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .preview-footer {
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .preview-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .preview-btn.download {
+      background: #27ae60;
+      color: #fff;
+    }
+
+    .preview-btn.share {
+      background: #3498db;
+      color: #fff;
+    }
+
+    /* 统计信息 */
+    .gallery-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .gallery-stat {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .gallery-stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f3460;
+    }
+
+    .gallery-stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="gallery-container">
+      <!-- 页面标题 -->
+      <div class="gallery-header">
+        <h1>🖼️ 高清图集</h1>
+        <p>欣赏中国古代建筑之美</p>
+      </div>
+
+      <!-- 统计信息 -->
+      <div class="gallery-stats">
+        <div class="gallery-stat">
+          <div class="gallery-stat-number">50+</div>
+          <div class="gallery-stat-label">建筑图片</div>
+        </div>
+        <div class="gallery-stat">
+          <div class="gallery-stat-number">4</div>
+          <div class="gallery-stat-label">分类</div>
+        </div>
+        <div class="gallery-stat">
+          <div class="gallery-stat-number">高清</div>
+          <div class="gallery-stat-label">品质</div>
+        </div>
+      </div>
+
+      <!-- 说明 -->
+      <div class="gallery-intro">
+        <h3>📥 资源说明</h3>
+        <p>本图集收录了中国古代著名建筑的参考图片，包括宫殿、寺庙、园林、桥梁等类型。由于版权原因，图集以外部链接形式提供，图片来源于维基百科等公开资源。</p>
+      </div>
+
+      <!-- 一键下载 -->
+      <div class="download-section">
+        <div class="download-title">📦 批量下载</div>
+        <button class="download-btn" onclick="downloadAll()">
+          <span>📥</span>
+          <span>打包下载全部图集</span>
+        </button>
+        <div class="download-size">包含所有分类，共50+张图片 · 提取码：arch</div>
+      </div>
+
+      <!-- 分类筛选 -->
+      <div class="gallery-categories">
+        <div class="category-btn active" data-category="all">全部</div>
+        <div class="category-btn" data-category="palace">宫殿</div>
+        <div class="category-btn" data-category="temple">寺庙</div>
+        <div class="category-btn" data-category="garden">园林</div>
+        <div class="category-btn" data-category="bridge">桥梁</div>
+      </div>
+
+      <!-- 图集列表 -->
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+  </div>
+
+  <!-- 图片预览弹窗 -->
+  <div class="preview-modal" id="previewModal">
+    <div class="preview-header">
+      <div class="preview-title" id="previewTitle">图片预览</div>
+      <div class="preview-close" onclick="closePreview()">×</div>
+    </div>
+    <div class="preview-content">
+      <div class="preview-placeholder">
+        <div class="preview-placeholder-icon" id="previewIcon">🏛️</div>
+        <div class="preview-placeholder-text" id="previewDesc">图片预览区</div>
+      </div>
+    </div>
+    <div class="preview-footer">
+      <button class="preview-btn download" onclick="downloadCurrent()">📥 保存图片</button>
+      <button class="preview-btn share" onclick="shareImage()">📤 分享</button>
+    </div>
+  </div>
+
+  <!-- 底部导航栏 -->
+  <div class="tab-bar">
+    <a href="index.html" class="tab-item">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-text">首页</span>
+    </a>
+    <a href="search.html" class="tab-item">
+      <span class="tab-icon">🔍</span>
+      <span class="tab-text">搜索</span>
+    </a>
+    <a href="map.html" class="tab-item">
+      <span class="tab-icon">🗺️</span>
+      <span class="tab-text">地图</span>
+    </a>
+    <a href="study.html" class="tab-item">
+      <span class="tab-icon">📖</span>
+      <span class="tab-text">学习</span>
+    </a>
+    <a href="favorites.html" class="tab-item">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-text">收藏</span>
+    </a>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    // 图集数据
+    const galleryData = [
+      { id: 1, name: '故宫太和殿', category: 'palace', icon: '🏛️', architect: '蒯祥', year: '明', period: '1420年' },
+      { id: 2, name: '天坛祈年殿', category: 'palace', icon: '⛩️', architect: '蒯祥', year: '明', period: '1420年' },
+      { id: 3, name: '颐和园佛香阁', category: 'garden', icon: '🏯', architect: '样式雷', year: '清', period: '1768年' },
+      { id: 4, name: '圆明园大水法', category: 'garden', icon: '🏛️', architect: '样式雷', year: '清', period: '1751年' },
+      { id: 5, name: '赵州桥', category: 'bridge', icon: '🌉', architect: '李春', year: '隋', period: '605年' },
+      { id: 6, name: '卢沟桥', category: 'bridge', icon: '🌉', architect: '待考', year: '金', period: '1189年' },
+      { id: 7, name: '应县木塔', category: 'temple', icon: '🗼', architect: '待考', year: '辽', period: '1056年' },
+      { id: 8, name: '布达拉宫', category: 'palace', icon: '🏔️', architect: '待考', year: '唐', period: '631年' },
+      { id: 9, name: '悬空寺', category: 'temple', icon: '⛪', architect: '待考', year: '北魏', period: '491年' },
+      { id: 10, name: '苏州拙政园', category: 'garden', icon: '🏡', architect: '文徵明', year: '明', period: '1559年' },
+      { id: 11, name: '都江堰', category: 'bridge', icon: '🌊', architect: '李冰', year: '战国', period: '前256年' },
+      { id: 12, name: '山西平遥古城', category: 'palace', icon: '🏘️', architect: '待考', year: '明', period: '1370年' }
+    ];
+
+    // 渲染图集
+    function renderGallery(category = 'all') {
+      const container = document.getElementById('galleryGrid');
+      const filteredData = category === 'all' 
+        ? galleryData 
+        : galleryData.filter(item => item.category === category);
+
+      container.innerHTML = filteredData.map(item => `
+        <div class="gallery-item" onclick="previewImage(${item.id})">
+          <div class="gallery-image">${item.icon}</div>
+          <div class="gallery-info">
+            <div class="gallery-name">${item.name}</div>
+            <div class="gallery-meta">
+              <span class="gallery-tag">${item.year}</span>
+              <span>${item.architect}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 分类切换
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderGallery(this.dataset.category);
+      });
+    });
+
+    // 预览图片
+    let currentImage = null;
+    function previewImage(id) {
+      const image = galleryData.find(item => item.id === id);
+      if (!image) return;
+      
+      currentImage = image;
+      document.getElementById('previewTitle').textContent = image.name;
+      document.getElementById('previewIcon').textContent = image.icon;
+      document.getElementById('previewDesc').textContent = `${image.architect} · ${image.year}`;
+      document.getElementById('previewModal').classList.add('show');
+    }
+
+    // 关闭预览
+    function closePreview() {
+      document.getElementById('previewModal').classList.remove('show');
+    }
+
+    // 下载当前图片
+    function downloadCurrent() {
+      if (!currentImage) return;
+      
+      // 创建提示
+      const link = `https://zh.wikipedia.org/wiki/${encodeURIComponent(currentImage.name)}`;
+      alert(`图片链接：${link}\n\n由于版权原因，图片来源于维基百科公开资源，请点击确定在新窗口打开。`);
+      window.open(link, '_blank');
+    }
+
+    // 分享图片
+    function shareImage() {
+      if (!currentImage) return;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: currentImage.name,
+          text: `查看中国古代建筑：${currentImage.name}`,
+          url: window.location.href
+        });
+      } else {
+        // 复制链接
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+          alert('链接已复制到剪贴板！');
+        });
+      }
+    }
+
+    // 打包下载
+    function downloadAll() {
+      // 生成下载信息
+      const links = [
+        { name: '故宫', url: 'https://zh.wikipedia.org/wiki/故宫' },
+        { name: '天坛', url: 'https://zh.wikipedia.org/wiki/天坛' },
+        { name: '颐和园', url: 'https://zh.wikipedia.org/wiki/颐和园' },
+        { name: '圆明园', url: 'https://zh.wikipedia.org/wiki/圆明园' },
+        { name: '赵州桥', url: 'https://zh.wikipedia.org/wiki/赵州桥' },
+        { name: '都江堰', url: 'https://zh.wikipedia.org/wiki/都江堰' }
+      ];
+
+      let message = '📥 高清图集下载链接：\n\n';
+      links.forEach(item => {
+        message += `${item.name}：${item.url}\n`;
+      });
+      message += '\n提取码：arch';
+
+      alert(message);
+    }
+
+    // 初始化
+    renderGallery();
+  </script>
+</body>
+</html>
