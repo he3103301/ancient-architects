@@ -30,47 +30,65 @@
     .map-wrapper {
       background: #fff;
       border-radius: 16px;
-      padding: 16px;
+      overflow: hidden;
       margin-bottom: 20px;
       box-shadow: 0 4px 20px rgba(139, 69, 19, 0.08);
     }
 
-    .china-map {
+    .map-image {
       width: 100%;
-      height: auto;
-      display: block;
+      height: 400px;
+      background: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=China%20map%20outline%20with%20provinces%20marked%2C%20traditional%20Chinese%20style%2C%20warm%20earth%20colors%2C%20minimalist%20design%2C%20historical%20map%20aesthetic&image_size=landscape_16_9') no-repeat center center;
+      background-size: cover;
+      position: relative;
     }
 
-    .map-legend {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-
-    .legend-item {
+    .map-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: #666;
+      justify-content: center;
     }
 
-    .legend-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    .map-overlay-content {
+      text-align: center;
+      color: #fff;
     }
 
-    .legend-dot.ancient { background: #8B4513; }
-    .legend-dot.tang { background: #D2691E; }
-    .legend-dot.song { background: #CD853F; }
-    .legend-dot.ming { background: #DEB887; }
-    .legend-dot.qing { background: #F4A460; }
-    .legend-dot.modern { background: #BC8F8F; }
+    .map-overlay-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .map-overlay-desc {
+      font-size: 16px;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .view-map-btn {
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
+    }
+
+    .view-map-btn:active {
+      transform: scale(0.98);
+    }
 
     .region-list {
       background: #fff;
@@ -206,21 +224,72 @@
       margin-top: 4px;
     }
 
-    .city-marker {
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .city-item {
+      background: #f9f6f0;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.3s;
+      border: 1px solid #e8dcc8;
     }
 
-    .city-marker:hover {
-      transform: scale(1.2);
+    .city-item:active {
+      background: #e8dcc8;
+      transform: scale(0.98);
     }
 
-    .city-label {
-      font-size: 9px;
-      fill: #666;
-      text-anchor: middle;
-      pointer-events: none;
+    .city-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
     }
+
+    .city-count {
+      font-size: 12px;
+      color: #8B4513;
+    }
+
+    .map-legend {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0ebe3;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .legend-dot.ancient { background: #8B4513; }
+    .legend-dot.tang { background: #D2691E; }
+    .legend-dot.song { background: #CD853F; }
+    .legend-dot.ming { background: #DEB887; }
+    .legend-dot.qing { background: #F4A460; }
+    .legend-dot.modern { background: #BC8F8F; }
   </style>
 </head>
 <body>
@@ -243,135 +312,15 @@
       </div>
 
       <div class="map-wrapper">
-        <svg class="china-map" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#f5f0e6;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#e8dcc8;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          
-          <rect width="100%" height="100%" fill="url(#mapGradient)" rx="8"/>
-          
-          <g fill="#d4c4a8" stroke="#c4b498" stroke-width="1.5">
-            <path d="M500,50 Q550,30 580,50 Q620,70 640,110 Q650,150 630,180 Q610,210 580,200 Q550,190 530,210 Q510,230 490,220 Q470,210 450,220 Q430,230 420,210 Q400,190 380,200 Q360,210 350,180 Q340,150 360,120 Q380,90 420,70 Q460,50 500,50 Z"/>
-            <path d="M580,50 Q620,40 650,50 Q680,70 700,100 Q710,140 700,170 Q680,200 650,190 Q630,180 630,160 Q640,130 640,110 Q620,80 580,70 Z"/>
-            <path d="M350,120 Q330,100 310,110 Q290,130 300,160 Q310,190 330,200 Q350,210 360,190 Q370,170 360,140 Z"/>
-            <path d="M420,70 Q400,50 380,60 Q360,80 370,110 Q380,140 400,150 Q420,160 430,140 Q440,120 430,90 Z"/>
-            <path d="M420,210 Q400,190 380,200 Q360,220 370,250 Q380,280 400,290 Q420,300 430,280 Q440,260 430,230 Z"/>
-            <path d="M530,210 Q510,190 490,200 Q470,220 480,250 Q490,280 510,290 Q530,300 540,280 Q550,260 540,230 Z"/>
-            <path d="M580,200 Q560,180 540,190 Q520,210 530,240 Q540,270 560,280 Q580,290 590,270 Q600,250 590,220 Z"/>
-            <path d="M360,190 Q340,170 320,180 Q300,200 310,230 Q320,260 340,270 Q360,280 370,260 Q380,240 370,210 Z"/>
-            <path d="M280,180 Q260,160 240,170 Q220,190 230,220 Q240,250 260,260 Q280,270 290,250 Q300,230 290,200 Z"/>
-            <path d="M240,220 Q220,200 200,210 Q180,230 190,260 Q200,290 220,300 Q240,310 250,290 Q260,270 250,240 Z"/>
-            <path d="M200,260 Q180,240 160,250 Q140,270 150,300 Q160,330 180,340 Q200,350 210,330 Q220,310 210,280 Z"/>
-            <path d="M160,250 Q140,230 120,240 Q100,260 110,290 Q120,320 140,330 Q160,340 170,320 Q180,300 170,270 Z"/>
-            <path d="M430,230 Q410,210 390,220 Q370,240 380,270 Q390,300 410,310 Q430,320 440,300 Q450,280 440,250 Z"/>
-            <path d="M370,260 Q350,240 330,250 Q310,270 320,300 Q330,330 350,340 Q370,350 380,330 Q390,310 380,280 Z"/>
-            <path d="M540,230 Q520,210 500,220 Q480,240 490,270 Q500,300 520,310 Q540,320 550,300 Q560,280 550,250 Z"/>
-            <path d="M490,270 Q470,250 450,260 Q430,280 440,310 Q450,340 470,350 Q490,360 500,340 Q510,320 500,290 Z"/>
-            <path d="M550,250 Q530,230 510,240 Q490,260 500,290 Q510,320 530,330 Q550,340 560,320 Q570,300 560,270 Z"/>
-            <path d="M320,300 Q300,280 280,290 Q260,310 270,340 Q280,370 300,380 Q320,390 330,370 Q340,350 330,320 Z"/>
-            <path d="M280,340 Q260,320 240,330 Q220,350 230,380 Q240,410 260,420 Q280,430 290,410 Q300,390 290,360 Z"/>
-            <path d="M240,380 Q220,360 200,370 Q180,390 190,420 Q200,450 220,460 Q240,470 250,450 Q260,430 250,400 Z"/>
-          </g>
-          
-          <g class="city-markers">
-            <circle cx="520" cy="120" r="6" fill="#8B4513" class="city-marker" data-city="北京"/>
-            <text x="520" y="135" class="city-label">北京</text>
-            
-            <circle cx="450" cy="160" r="5" fill="#D2691E" class="city-marker" data-city="西安"/>
-            <text x="450" y="175" class="city-label">西安</text>
-            
-            <circle cx="490" cy="190" r="5" fill="#CD853F" class="city-marker" data-city="洛阳"/>
-            <text x="490" y="205" class="city-label">洛阳</text>
-            
-            <circle cx="510" cy="210" r="5" fill="#DEB887" class="city-marker" data-city="开封"/>
-            <text x="510" y="225" class="city-label">开封</text>
-            
-            <circle cx="540" cy="230" r="6" fill="#F4A460" class="city-marker" data-city="南京"/>
-            <text x="540" y="245" class="city-label">南京</text>
-            
-            <circle cx="560" cy="250" r="5" fill="#BC8F8F" class="city-marker" data-city="苏州"/>
-            <text x="560" y="265" class="city-label">苏州</text>
-            
-            <circle cx="550" cy="270" r="5" fill="#8B4513" class="city-marker" data-city="杭州"/>
-            <text x="550" y="285" class="city-label">杭州</text>
-            
-            <circle cx="580" cy="260" r="5" fill="#D2691E" class="city-marker" data-city="上海"/>
-            <text x="580" y="275" class="city-label">上海</text>
-            
-            <circle cx="380" cy="180" r="5" fill="#CD853F" class="city-marker" data-city="成都"/>
-            <text x="380" y="195" class="city-label">成都</text>
-            
-            <circle cx="350" cy="220" r="4" fill="#DEB887" class="city-marker" data-city="拉萨"/>
-            <text x="350" y="235" class="city-label">拉萨</text>
-            
-            <circle cx="420" cy="200" r="5" fill="#F4A460" class="city-marker" data-city="重庆"/>
-            <text x="420" y="215" class="city-label">重庆</text>
-            
-            <circle cx="480" cy="250" r="5" fill="#BC8F8F" class="city-marker" data-city="长沙"/>
-            <text x="480" y="265" class="city-label">长沙</text>
-            
-            <circle cx="500" cy="270" r="5" fill="#8B4513" class="city-marker" data-city="广州"/>
-            <text x="500" y="285" class="city-label">广州</text>
-            
-            <circle cx="490" cy="290" r="4" fill="#D2691E" class="city-marker" data-city="福州"/>
-            <text x="490" y="305" class="city-label">福州</text>
-            
-            <circle cx="530" cy="290" r="4" fill="#CD853F" class="city-marker" data-city="泉州"/>
-            <text x="530" y="305" class="city-label">泉州</text>
-            
-            <circle cx="390" cy="140" r="5" fill="#DEB887" class="city-marker" data-city="昆明"/>
-            <text x="390" y="155" class="city-label">昆明</text>
-            
-            <circle cx="440" cy="120" r="5" fill="#F4A460" class="city-marker" data-city="贵阳"/>
-            <text x="440" y="135" class="city-label">贵阳</text>
-            
-            <circle cx="360" cy="160" r="4" fill="#BC8F8F" class="city-marker" data-city="大理"/>
-            <text x="360" y="175" class="city-label">大理</text>
-            
-            <circle cx="410" cy="100" r="5" fill="#8B4513" class="city-marker" data-city="太原"/>
-            <text x="410" y="115" class="city-label">太原</text>
-            
-            <circle cx="430" cy="80" r="5" fill="#D2691E" class="city-marker" data-city="大同"/>
-            <text x="430" y="95" class="city-label">大同</text>
-            
-            <circle cx="400" cy="120" r="5" fill="#CD853F" class="city-marker" data-city="济南"/>
-            <text x="400" y="135" class="city-label">济南</text>
-            
-            <circle cx="420" cy="140" r="5" fill="#DEB887" class="city-marker" data-city="曲阜"/>
-            <text x="420" y="155" class="city-label">曲阜</text>
-            
-            <circle cx="540" cy="90" r="5" fill="#F4A460" class="city-marker" data-city="沈阳"/>
-            <text x="540" y="105" class="city-label">沈阳</text>
-            
-            <circle cx="560" cy="110" r="5" fill="#BC8F8F" class="city-marker" data-city="承德"/>
-            <text x="560" y="125" class="city-label">承德</text>
-            
-            <circle cx="370" cy="100" r="5" fill="#8B4513" class="city-marker" data-city="邯郸"/>
-            <text x="370" y="115" class="city-label">邯郸</text>
-            
-            <circle cx="460" cy="180" r="5" fill="#D2691E" class="city-marker" data-city="南阳"/>
-            <text x="460" y="195" class="city-label">南阳</text>
-            
-            <circle cx="520" cy="250" r="5" fill="#CD853F" class="city-marker" data-city="扬州"/>
-            <text x="520" y="265" class="city-label">扬州</text>
-            
-            <circle cx="500" cy="230" r="5" fill="#DEB887" class="city-marker" data-city="宁波"/>
-            <text x="500" y="245" class="city-label">宁波</text>
-            
-            <circle cx="470" cy="210" r="5" fill="#F4A460" class="city-marker" data-city="绍兴"/>
-            <text x="470" y="225" class="city-label">绍兴</text>
-            
-            <circle cx="430" cy="160" r="5" fill="#BC8F8F" class="city-marker" data-city="赣州"/>
-            <text x="430" y="175" class="city-label">赣州</text>
-          </g>
-          
-          <rect x="50" y="500" width="200" height="60" rx="8" fill="#fff" opacity="0.9"/>
-          <text x="60" y="520" font-size="12" fill="#666">点击城市查看建筑家</text>
-          <text x="60" y="540" font-size="11" fill="#999">数据来源：中国建筑科学家百科</text>
-        </svg>
+        <div class="map-image">
+          <div class="map-overlay">
+            <div class="map-overlay-content">
+              <div class="map-overlay-title">中华建筑瑰宝</div>
+              <div class="map-overlay-desc">跨越千年的建筑智慧与工艺传承</div>
+              <button class="view-map-btn" onclick="scrollToMap()">探索地图</button>
+            </div>
+          </div>
+        </div>
         
         <div class="map-legend">
           <div class="legend-item">
@@ -401,7 +350,7 @@
         </div>
       </div>
 
-      <div class="region-list">
+      <div class="region-list" id="mapSection">
         <div class="region-title">📍 各地建筑分布</div>
         <div class="region-tabs">
           <div class="region-tab active" data-region="all">全部</div>
@@ -413,6 +362,7 @@
           <div class="region-tab" data-region="东北">东北</div>
           <div class="region-tab" data-region="华南">华南</div>
         </div>
+        
         <div class="region-content active" id="region-all"></div>
         <div class="region-content" id="region-华北"></div>
         <div class="region-content" id="region-西北"></div>
@@ -453,55 +403,44 @@
     const locationData = [
       { name: '鲁班', dynasty: '春秋', location: '山东曲阜', region: '华东', city: '曲阜' },
       { name: '李冰', dynasty: '战国', location: '四川成都', region: '西南', city: '成都' },
-      { name: '蒙恬', dynasty: '秦', location: '陕西咸阳', region: '西北', city: '西安' },
+      { name: '蒙恬', dynasty: '秦', location: '陕西咸阳', region: '西北', city: '咸阳' },
       { name: '张骞', dynasty: '汉', location: '陕西西安', region: '西北', city: '西安' },
       { name: '张衡', dynasty: '东汉', location: '河南南阳', region: '华中', city: '南阳' },
       { name: '马钧', dynasty: '三国', location: '陕西西安', region: '西北', city: '西安' },
       { name: '宇文恺', dynasty: '隋', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '李春', dynasty: '隋', location: '河北赵县', region: '华北', city: '邯郸' },
+      { name: '李春', dynasty: '隋', location: '河北赵县', region: '华北', city: '石家庄' },
       { name: '阎立德', dynasty: '唐', location: '陕西西安', region: '西北', city: '西安' },
       { name: '喻皓', dynasty: '五代', location: '浙江杭州', region: '华东', city: '杭州' },
       { name: '李诫', dynasty: '北宋', location: '河南开封', region: '华中', city: '开封' },
       { name: '沈括', dynasty: '北宋', location: '浙江杭州', region: '华东', city: '杭州' },
-      { name: '张择端', dynasty: '北宋', location: '山东潍坊', region: '华东', city: '济南' },
+      { name: '张择端', dynasty: '北宋', location: '山东潍坊', region: '华东', city: '潍坊' },
       { name: '李嵩', dynasty: '南宋', location: '浙江杭州', region: '华东', city: '杭州' },
       { name: '郭守敬', dynasty: '元', location: '北京', region: '华北', city: '北京' },
       { name: '蒯祥', dynasty: '明', location: '北京', region: '华北', city: '北京' },
       { name: '计成', dynasty: '明', location: '江苏苏州', region: '华东', city: '苏州' },
       { name: '文震亨', dynasty: '明', location: '江苏苏州', region: '华东', city: '苏州' },
       { name: '徐光启', dynasty: '明', location: '上海', region: '华东', city: '上海' },
-      { name: '宋应星', dynasty: '明', location: '江西宜春', region: '华东', city: '赣州' },
+      { name: '宋应星', dynasty: '明', location: '江西宜春', region: '华东', city: '宜春' },
       { name: '雷发达', dynasty: '清', location: '北京', region: '华北', city: '北京' },
       { name: '雷金玉', dynasty: '清', location: '北京', region: '华北', city: '北京' },
       { name: '姚承祖', dynasty: '清', location: '江苏苏州', region: '华东', city: '苏州' },
       { name: '梁思成', dynasty: '现代', location: '北京', region: '华北', city: '北京' },
       { name: '林徽因', dynasty: '现代', location: '北京', region: '华北', city: '北京' },
-      { name: '柳宗元', dynasty: '唐', location: '山西运城', region: '华北', city: '太原' },
+      { name: '柳宗元', dynasty: '唐', location: '山西运城', region: '华北', city: '运城' },
       { name: '刘禹锡', dynasty: '唐', location: '河南洛阳', region: '华中', city: '洛阳' },
       { name: '王维', dynasty: '唐', location: '山西太原', region: '华北', city: '太原' },
-      { name: '白居易', dynasty: '唐', location: '陕西渭南', region: '西北', city: '西安' },
-      { name: '蒋少游', dynasty: '北魏', location: '山东博兴', region: '华东', city: '济南' },
+      { name: '白居易', dynasty: '唐', location: '陕西渭南', region: '西北', city: '渭南' },
+      { name: '蒋少游', dynasty: '北魏', location: '山东博兴', region: '华东', city: '滨州' },
       { name: '张涟', dynasty: '明末清初', location: '江苏松江', region: '华东', city: '上海' },
-      { name: '李渔', dynasty: '明末清初', location: '浙江兰溪', region: '华东', city: '杭州' },
+      { name: '李渔', dynasty: '明末清初', location: '浙江兰溪', region: '华东', city: '金华' },
       { name: '雷思起', dynasty: '清', location: '北京', region: '华北', city: '北京' },
       { name: '雷献彩', dynasty: '清', location: '北京', region: '华北', city: '北京' },
       { name: '陈明达', dynasty: '现代', location: '湖南长沙', region: '华中', city: '长沙' },
-      { name: '刘敦桢', dynasty: '现代', location: '湖南新宁', region: '华中', city: '长沙' },
+      { name: '刘敦桢', dynasty: '现代', location: '湖南新宁', region: '华中', city: '邵阳' },
       { name: '朱启钤', dynasty: '现代', location: '贵州开州', region: '西南', city: '贵阳' },
       { name: '雷金鸣', dynasty: '清', location: '北京', region: '华北', city: '北京' },
       { name: '阮安', dynasty: '明', location: '北京', region: '华北', city: '北京' },
-      { name: '阮元', dynasty: '清', location: '江苏仪征', region: '华东', city: '扬州' },
-      { name: '李诫', dynasty: '北宋', location: '河南开封', region: '华中', city: '开封' },
-      { name: '沈括', dynasty: '北宋', location: '浙江杭州', region: '华东', city: '杭州' },
-      { name: '喻皓', dynasty: '五代', location: '浙江杭州', region: '华东', city: '杭州' },
-      { name: '宇文恺', dynasty: '隋', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '李春', dynasty: '隋', location: '河北赵县', region: '华北', city: '邯郸' },
-      { name: '马钧', dynasty: '三国', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '张衡', dynasty: '东汉', location: '河南南阳', region: '华中', city: '南阳' },
-      { name: '张骞', dynasty: '汉', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '蒙恬', dynasty: '秦', location: '陕西咸阳', region: '西北', city: '西安' },
-      { name: '李冰', dynasty: '战国', location: '四川成都', region: '西南', city: '成都' },
-      { name: '鲁班', dynasty: '春秋', location: '山东曲阜', region: '华东', city: '曲阜' }
+      { name: '阮元', dynasty: '清', location: '江苏仪征', region: '华东', city: '扬州' }
     ];
 
     const regionGroups = {
@@ -515,13 +454,37 @@
       '华南': locationData.filter(item => item.region === '华南')
     };
 
+    function getCityCounts(items) {
+      const counts = {};
+      items.forEach(item => {
+        counts[item.city] = (counts[item.city] || 0) + 1;
+      });
+      return counts;
+    }
+
     function renderRegionList(region) {
       const container = document.getElementById(`region-${region}`);
       const items = regionGroups[region] || [];
       
       const uniqueItems = [...new Map(items.map(item => [item.name, item])).values()];
+      const cityCounts = getCityCounts(items);
       
-      container.innerHTML = uniqueItems.map(item => `
+      let html = '';
+      
+      html += '<div class="city-grid">';
+      Object.entries(cityCounts).forEach(([city, count]) => {
+        html += `
+          <div class="city-item" onclick="showCityArchitects('${city}')">
+            <div class="city-name">${city}</div>
+            <div class="city-count">${count}位建筑家</div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      html += '<div style="margin-top: 20px;">';
+      html += '<div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">建筑家列表</div>';
+      html += uniqueItems.map(item => `
         <a href="detail.html?name=${encodeURIComponent(item.name)}" class="architect-map-card">
           <div class="architect-map-avatar">${item.name[0]}</div>
           <div class="architect-map-info">
@@ -531,6 +494,24 @@
           <span class="architect-map-link">查看 ›</span>
         </a>
       `).join('');
+      html += '</div>';
+      
+      container.innerHTML = html;
+    }
+
+    function showCityArchitects(city) {
+      const cityArchitects = locationData.filter(item => item.city === city);
+      const uniqueNames = [...new Set(cityArchitects.map(item => item.name))];
+      
+      if (uniqueNames.length > 0) {
+        alert(`${city}：收录 ${uniqueNames.length} 位建筑家\n${uniqueNames.join('、')}`);
+      } else {
+        alert(`${city}：暂无收录的建筑家`);
+      }
+    }
+
+    function scrollToMap() {
+      document.getElementById('mapSection').scrollIntoView({ behavior: 'smooth' });
     }
 
     Object.keys(regionGroups).forEach(region => {
@@ -545,20 +526,6 @@
         this.classList.add('active');
         const region = this.dataset.region;
         document.getElementById(`region-${region}`).classList.add('active');
-      });
-    });
-
-    document.querySelectorAll('.city-marker').forEach(marker => {
-      marker.addEventListener('click', function() {
-        const city = this.dataset.city;
-        const cityArchitects = locationData.filter(item => item.city === city);
-        const uniqueNames = [...new Set(cityArchitects.map(item => item.name))];
-        
-        if (uniqueNames.length > 0) {
-          alert(`${city}：收录 ${uniqueNames.length} 位建筑家\n${uniqueNames.join('、')}`);
-        } else {
-          alert(`${city}：暂无收录的建筑家`);
-        }
       });
     });
   </script>
