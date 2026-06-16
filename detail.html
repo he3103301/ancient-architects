@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <a href="search.html" class="back-btn">‹</a>
+  <div class="back-btn" onclick="goBack()">‹</div>
   
   <div class="container" id="detailContainer">
     <div class="card">
@@ -83,6 +83,14 @@
       <span class="tab-icon">🔍</span>
       <span class="tab-text">搜索</span>
     </a>
+    <a href="map.html" class="tab-item">
+      <span class="tab-icon">🗺️</span>
+      <span class="tab-text">地图</span>
+    </a>
+    <a href="study.html" class="tab-item">
+      <span class="tab-icon">📖</span>
+      <span class="tab-text">学习</span>
+    </a>
     <a href="favorites.html" class="tab-item">
       <span class="tab-icon">⭐</span>
       <span class="tab-text">收藏</span>
@@ -92,6 +100,19 @@
   <script src="js/data.js"></script>
   <script>
     let currentArchitect = null;
+    
+    function goBack() {
+      const referrer = document.referrer;
+      if (referrer && referrer.includes('map.html')) {
+        window.location.href = 'map.html';
+      } else if (referrer && referrer.includes('search.html')) {
+        window.location.href = 'search.html';
+      } else if (referrer && referrer.includes('index.html')) {
+        window.location.href = 'index.html';
+      } else {
+        window.history.back();
+      }
+    }
     
     document.addEventListener('DOMContentLoaded', function() {
       const id = parseInt(getUrlParam('id'));
@@ -128,7 +149,6 @@
       document.getElementById('architectStyle').textContent = architect.style;
       document.getElementById('architectContribution').textContent = architect.contribution;
       
-      // 作品列表
       document.getElementById('architectWorks').innerHTML = architect.works.map(work => `
         <div class="work-item">
           <span class="work-dot">•</span>
@@ -136,7 +156,6 @@
         </div>
       `).join('');
       
-      // 名言
       if (architect.quote) {
         document.getElementById('quoteSection').style.display = 'block';
         document.getElementById('architectQuote').textContent = architect.quote;
