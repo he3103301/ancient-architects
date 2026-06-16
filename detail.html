@@ -99,6 +99,33 @@
 
   <script src="js/data.js"></script>
   <script>
+    function getUrlParam(name) {
+      const url = window.location.search;
+      const params = new URLSearchParams(url);
+      return params.get(name);
+    }
+    
+    function getFavorites() {
+      const favs = localStorage.getItem('favorites');
+      return favs ? JSON.parse(favs) : [];
+    }
+    
+    function isFavorite(id) {
+      const favs = getFavorites();
+      return favs.includes(id);
+    }
+    
+    function toggleFavorite(id) {
+      const favs = getFavorites();
+      const index = favs.indexOf(id);
+      if (index > -1) {
+        favs.splice(index, 1);
+      } else {
+        favs.push(id);
+      }
+      localStorage.setItem('favorites', JSON.stringify(favs));
+    }
+    
     let currentArchitect = null;
     
     function goBack() {
