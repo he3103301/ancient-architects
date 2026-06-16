@@ -336,14 +336,18 @@
           <div class="region-tab" data-region="西北">西北</div>
           <div class="region-tab" data-region="华东">华东</div>
           <div class="region-tab" data-region="华中">华中</div>
-          <div class="region-tab" data-region="西南">西南</div>
-        </div>
-        <div class="region-content active" id="region-all"></div>
-        <div class="region-content" id="region-华北"></div>
-        <div class="region-content" id="region-西北"></div>
-        <div class="region-content" id="region-华东"></div>
-        <div class="region-content" id="region-华中"></div>
-        <div class="region-content" id="region-西南"></div>
+        <div class="region-tab" data-region="西南">西南</div>
+        <div class="region-tab" data-region="东北">东北</div>
+        <div class="region-tab" data-region="华南">华南</div>
+      </div>
+      <div class="region-content active" id="region-all"></div>
+      <div class="region-content" id="region-华北"></div>
+      <div class="region-content" id="region-西北"></div>
+      <div class="region-content" id="region-华东"></div>
+      <div class="region-content" id="region-华中"></div>
+      <div class="region-content" id="region-西南"></div>
+      <div class="region-content" id="region-东北"></div>
+      <div class="region-content" id="region-华南"></div>
       </div>
     </div>
   </div>
@@ -385,11 +389,9 @@
       { name: '宇文恺', dynasty: '隋', location: '陕西西安', region: '西北', works: ['大兴城', '广通渠'] },
       { name: '李春', dynasty: '隋', location: '河北赵县', region: '华北', works: ['赵州桥'] },
       { name: '阎立德', dynasty: '唐', location: '陕西西安', region: '西北', works: ['大明宫', '翠微宫'] },
-      { name: '李约瑟', dynasty: '唐', location: '陕西西安', region: '西北', works: ['建筑学著作'] },
       { name: '喻皓', dynasty: '五代', location: '浙江杭州', region: '华东', works: ['木经'] },
       { name: '李诫', dynasty: '北宋', location: '河南开封', region: '华中', works: ['营造法式'] },
       { name: '沈括', dynasty: '北宋', location: '浙江杭州', region: '华东', works: ['梦溪笔谈'] },
-      { name: '李春', dynasty: '隋', location: '河北赵县', region: '华北', works: ['赵州桥'] },
       { name: '张择端', dynasty: '北宋', location: '山东潍坊', region: '华东', works: ['清明上河图'] },
       { name: '李嵩', dynasty: '南宋', location: '浙江杭州', region: '华东', works: ['建筑画'] },
       { name: '郭守敬', dynasty: '元', location: '北京', region: '华北', works: ['登封观星台'] },
@@ -400,10 +402,24 @@
       { name: '宋应星', dynasty: '明', location: '江西宜春', region: '华东', works: ['天工开物'] },
       { name: '雷发达', dynasty: '清', location: '北京', region: '华北', works: ['样式雷图档'] },
       { name: '雷金玉', dynasty: '清', location: '北京', region: '华北', works: ['圆明园'] },
-      { name: '样式雷', dynasty: '清', location: '北京', region: '华北', works: ['清西陵', '颐和园'] },
       { name: '姚承祖', dynasty: '清', location: '江苏苏州', region: '华东', works: ['营造法原'] },
       { name: '梁思成', dynasty: '现代', location: '北京', region: '华北', works: ['中国建筑史'] },
-      { name: '林徽因', dynasty: '现代', location: '北京', region: '华北', works: ['人民英雄纪念碑'] }
+      { name: '林徽因', dynasty: '现代', location: '北京', region: '华北', works: ['人民英雄纪念碑'] },
+      { name: '柳宗元', dynasty: '唐', location: '山西运城', region: '华北', works: ['永州八记'] },
+      { name: '刘禹锡', dynasty: '唐', location: '河南洛阳', region: '华中', works: ['陋室铭'] },
+      { name: '王维', dynasty: '唐', location: '山西太原', region: '华北', works: ['辋川别业'] },
+      { name: '白居易', dynasty: '唐', location: '陕西渭南', region: '西北', works: ['庐山草堂'] },
+      { name: '蒋少游', dynasty: '北魏', location: '山东博兴', region: '华东', works: ['金墉城门楼'] },
+      { name: '张涟', dynasty: '明末清初', location: '江苏松江', region: '华东', works: ['拙政园假山'] },
+      { name: '李渔', dynasty: '明末清初', location: '浙江兰溪', region: '华东', works: ['闲情偶寄'] },
+      { name: '雷思起', dynasty: '清', location: '北京', region: '华北', works: ['清西陵'] },
+      { name: '雷献彩', dynasty: '清', location: '北京', region: '华北', works: ['崇陵'] },
+      { name: '陈明达', dynasty: '现代', location: '湖南长沙', region: '华中', works: ['中国古代建筑结构技术'] },
+      { name: '刘敦桢', dynasty: '现代', location: '湖南新宁', region: '华中', works: ['中国古代建筑史'] },
+      { name: '朱启钤', dynasty: '现代', location: '贵州开州', region: '西南', works: ['中国建筑学会'] },
+      { name: '雷金鸣', dynasty: '清', location: '北京', region: '华北', works: ['静宜园'] },
+      { name: '阮安', dynasty: '明', location: '北京', region: '华北', works: ['紫禁城三大殿重建'] },
+      { name: '阮元', dynasty: '清', location: '江苏仪征', region: '华东', works: ['山左金石志'] }
     ];
 
     // 按区域分组
@@ -413,7 +429,9 @@
       '西北': locationData.filter(item => item.region === '西北'),
       '华东': locationData.filter(item => item.region === '华东'),
       '华中': locationData.filter(item => item.region === '华中'),
-      '西南': locationData.filter(item => item.region === '西南')
+      '西南': locationData.filter(item => item.region === '西南'),
+      '东北': locationData.filter(item => item.region === '东北'),
+      '华南': locationData.filter(item => item.region === '华南')
     };
 
     // 渲染列表
