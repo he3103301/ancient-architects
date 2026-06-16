@@ -95,7 +95,13 @@
     
     document.addEventListener('DOMContentLoaded', function() {
       const id = parseInt(getUrlParam('id'));
-      currentArchitect = architects.find(item => item.id === id);
+      const name = getUrlParam('name');
+      
+      if (id) {
+        currentArchitect = architects.find(item => item.id === id);
+      } else if (name) {
+        currentArchitect = architects.find(item => item.name === decodeURIComponent(name));
+      }
       
       if (currentArchitect) {
         renderDetail(currentArchitect);
