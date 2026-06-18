@@ -7,112 +7,218 @@
   <link rel="stylesheet" href="css/style.css">
   <style>
     .map-container {
-      padding: 20px;
-      padding-bottom: 120px;
+      padding: 15px;
+      padding-bottom: 100px;
     }
 
     .map-header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .map-header h1 {
-      font-size: 24px;
-      color: #333;
-      margin-bottom: 8px;
+      font-size: 22px;
+      color: #5D3A1A;
+      margin-bottom: 6px;
+      font-weight: 700;
     }
 
     .map-header p {
-      font-size: 14px;
-      color: #666;
+      font-size: 13px;
+      color: #8B6914;
     }
 
     .map-wrapper {
       background: #fff;
       border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 20px;
+      padding: 15px;
+      margin-bottom: 15px;
       box-shadow: 0 4px 20px rgba(139, 69, 19, 0.08);
+      overflow: hidden;
     }
 
-    .map-image {
+    .china-map {
       width: 100%;
-      height: 400px;
-      background: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=China%20map%20outline%20with%20provinces%20marked%2C%20traditional%20Chinese%20style%2C%20warm%20earth%20colors%2C%20minimalist%20design%2C%20historical%20map%20aesthetic&image_size=landscape_16_9') no-repeat center center;
-      background-size: cover;
+      height: 320px;
       position: relative;
+      background: linear-gradient(135deg, #FFF8E7 0%, #FAF3E0 100%);
+      border-radius: 12px;
+      border: 2px solid #E8DCC8;
     }
 
-    .map-overlay {
+    .china-map svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .province {
+      fill: #E8DCC8;
+      stroke: #8B6914;
+      stroke-width: 1;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .province:hover {
+      fill: #D2B48C;
+    }
+
+    .province.active {
+      fill: #CD853F;
+    }
+
+    .city-marker {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 10;
     }
 
-    .map-overlay-content {
-      text-align: center;
+    .city-marker::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .city-marker:hover::after {
+      opacity: 0.3;
+    }
+
+    .city-marker.ancient { background: #8B4513; box-shadow: 0 0 8px #8B4513; }
+    .city-marker.tang { background: #D2691E; box-shadow: 0 0 8px #D2691E; }
+    .city-marker.song { background: #CD853F; box-shadow: 0 0 8px #CD853F; }
+    .city-marker.ming { background: #DEB887; box-shadow: 0 0 8px #DEB887; }
+    .city-marker.qing { background: #F4A460; box-shadow: 0 0 8px #F4A460; }
+    .city-marker.modern { background: #BC8F8F; box-shadow: 0 0 8px #BC8F8F; }
+
+    .city-marker:hover {
+      transform: scale(1.5);
+      z-index: 20;
+    }
+
+    .city-tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.85);
       color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 100;
+      white-space: nowrap;
     }
 
-    .map-overlay-title {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    .city-tooltip.visible {
+      opacity: 1;
     }
 
-    .map-overlay-desc {
-      font-size: 16px;
-      margin-bottom: 20px;
+    .city-tooltip .tooltip-city {
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+      color: #F4A460;
+    }
+
+    .city-tooltip .tooltip-count {
+      font-size: 11px;
       opacity: 0.9;
     }
 
-    .view-map-btn {
-      padding: 12px 32px;
-      background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-      color: #fff;
-      border: none;
-      border-radius: 30px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
+    .map-legend {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      padding-top: 15px;
+      border-top: 1px solid #F0EBE3;
     }
 
-    .view-map-btn:active {
-      transform: scale(0.98);
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #666;
+      background: #F9F6F0;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .legend-dot.ancient { background: #8B4513; }
+    .legend-dot.tang { background: #D2691E; }
+    .legend-dot.song { background: #CD853F; }
+    .legend-dot.ming { background: #DEB887; }
+    .legend-dot.qing { background: #F4A460; }
+    .legend-dot.modern { background: #BC8F8F; }
+
+    .map-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .map-stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 8px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.06);
+    }
+
+    .map-stat-number {
+      font-size: 22px;
+      font-weight: 700;
+      color: #8B4513;
+    }
+
+    .map-stat-label {
+      font-size: 11px;
+      color: #999;
+      margin-top: 3px;
     }
 
     .region-list {
       background: #fff;
       border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 15px;
       box-shadow: 0 4px 20px rgba(139, 69, 19, 0.08);
     }
 
     .region-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
-      color: #333;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
+      color: #5D3A1A;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 2px solid #8B4513;
     }
 
     .region-tabs {
       display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 6px;
+      margin-bottom: 12px;
       overflow-x: auto;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
       scrollbar-width: none;
     }
 
@@ -121,10 +227,10 @@
     }
 
     .region-tab {
-      padding: 8px 16px;
+      padding: 6px 14px;
       background: #f9f6f0;
-      border-radius: 20px;
-      font-size: 14px;
+      border-radius: 16px;
+      font-size: 13px;
       color: #8B4513;
       white-space: nowrap;
       cursor: pointer;
@@ -146,95 +252,17 @@
       display: block;
     }
 
-    .architect-map-card {
-      display: flex;
-      align-items: center;
-      padding: 16px;
-      background: #faf8f5;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      transition: all 0.3s;
-      border: 1px solid #f0ebe3;
-    }
-
-    .architect-map-card:active {
-      background: #f0ebe3;
-      transform: translateX(4px);
-    }
-
-    .architect-map-avatar {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #8B4513, #A0522D);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 20px;
-      margin-right: 16px;
-      flex-shrink: 0;
-    }
-
-    .architect-map-info {
-      flex: 1;
-    }
-
-    .architect-map-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
-    }
-
-    .architect-map-location {
-      font-size: 12px;
-      color: #999;
-    }
-
-    .architect-map-link {
-      color: #8B4513;
-      font-size: 14px;
-    }
-
-    .map-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .map-stat-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.06);
-    }
-
-    .map-stat-number {
-      font-size: 28px;
-      font-weight: 700;
-      color: #8B4513;
-    }
-
-    .map-stat-label {
-      font-size: 12px;
-      color: #999;
-      margin-top: 4px;
-    }
-
     .city-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 16px;
+      gap: 10px;
+      margin-bottom: 15px;
     }
 
     .city-item {
       background: #f9f6f0;
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 10px 6px;
       text-align: center;
       cursor: pointer;
       transition: all 0.3s;
@@ -247,49 +275,165 @@
     }
 
     .city-name {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: #333;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .city-count {
-      font-size: 12px;
+      font-size: 11px;
       color: #8B4513;
     }
 
-    .map-legend {
+    .architect-map-card {
       display: flex;
+      align-items: center;
+      padding: 14px;
+      background: #faf8f5;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+      border: 1px solid #f0ebe3;
+    }
+
+    .architect-map-card:active {
+      background: #f0ebe3;
+      transform: translateX(4px);
+    }
+
+    .architect-map-avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #8B4513, #A0522D);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      gap: 16px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-      padding-bottom: 16px;
+      color: #fff;
+      font-size: 18px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .architect-map-info {
+      flex: 1;
+    }
+
+    .architect-map-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 3px;
+    }
+
+    .architect-map-location {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .architect-map-link {
+      color: #8B4513;
+      font-size: 13px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 16px;
+      width: 85%;
+      max-width: 350px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 20px;
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+
+    .modal-overlay.visible .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #5D3A1A;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .modal-architect-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
       border-bottom: 1px solid #f0ebe3;
     }
 
-    .legend-item {
+    .modal-architect-item:last-child {
+      border-bottom: none;
+    }
+
+    .modal-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #8B4513, #A0522D);
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: #666;
+      justify-content: center;
+      color: #fff;
+      font-size: 17px;
+      margin-right: 12px;
     }
 
-    .legend-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    .modal-info {
+      flex: 1;
     }
 
-    .legend-dot.ancient { background: #8B4513; }
-    .legend-dot.tang { background: #D2691E; }
-    .legend-dot.song { background: #CD853F; }
-    .legend-dot.ming { background: #DEB887; }
-    .legend-dot.qing { background: #F4A460; }
-    .legend-dot.modern { background: #BC8F8F; }
+    .modal-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 2px;
+    }
+
+    .modal-dynasty {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .modal-close {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
@@ -302,26 +446,62 @@
 
       <div class="map-stats">
         <div class="map-stat-card">
-          <div class="map-stat-number">35</div>
-          <div class="map-stat-label">覆盖城市</div>
+          <div class="map-stat-number">42</div>
+          <div class="map-stat-label">建筑家</div>
         </div>
         <div class="map-stat-card">
-          <div class="map-stat-number">100+</div>
-          <div class="map-stat-label">代表建筑</div>
+          <div class="map-stat-number">20+</div>
+          <div class="map-stat-label">城市</div>
+        </div>
+        <div class="map-stat-card">
+          <div class="map-stat-number">8</div>
+          <div class="map-stat-label">朝代</div>
         </div>
       </div>
 
       <div class="map-wrapper">
-        <div class="map-image">
-          <div class="map-overlay">
-            <div class="map-overlay-content">
-              <div class="map-overlay-title">中华建筑瑰宝</div>
-              <div class="map-overlay-desc">跨越千年的建筑智慧与工艺传承</div>
-              <button class="view-map-btn" onclick="scrollToMap()">探索地图</button>
-            </div>
-          </div>
+        <div class="china-map" id="chinaMap">
+          <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+            <path d="M350,80 Q360,70 365,85 L370,100 Q368,115 360,120 L355,115 Q350,100 350,80" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M280,30 Q290,20 300,25 L310,35 Q305,45 295,40 L285,35 Q280,30 280,30" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M60,100 Q50,80 45,95 L40,110 Q45,125 55,120 L65,115 Q60,100 60,100" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M320,140 Q330,130 340,135 L350,145 Q345,155 335,150 L325,145 Q320,140 320,140" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M200,150 Q220,130 240,140 L260,155 Q255,170 235,175 L215,170 Q195,160 200,150" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M200,60 Q220,40 240,50 L260,65 Q255,80 235,85 L215,80 Q195,70 200,60" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M280,60 Q300,40 320,50 L340,65 Q335,80 315,85 L295,80 Q275,70 280,60" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M280,100 Q300,80 320,90 L340,105 Q335,120 315,125 L295,120 Q275,110 280,100" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M240,100 Q260,80 280,90 L300,105 Q295,120 275,125 L255,120 Q235,110 240,100" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M200,100 Q220,80 240,90 L260,105 Q255,120 235,125 L215,120 Q195,110 200,100" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M160,120 Q180,100 200,110 L220,125 Q215,140 195,145 L175,140 Q155,130 160,120" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M160,160 Q180,140 200,150 L220,165 Q215,180 195,185 L175,180 Q155,170 160,160" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M200,180 Q220,160 240,170 L260,185 Q255,200 235,205 L215,200 Q195,190 200,180" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M240,180 Q260,160 280,170 L300,185 Q295,200 275,205 L255,200 Q235,190 240,180" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M280,180 Q300,160 320,170 L340,185 Q335,200 315,205 L295,200 Q275,190 280,180" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M200,220 Q220,200 240,210 L260,225 Q255,240 235,245 L215,240 Q195,230 200,220" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M160,200 Q180,180 200,190 L220,205 Q215,220 195,225 L175,220 Q155,210 160,200" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M120,200 Q140,180 160,190 L180,205 Q175,220 155,225 L135,220 Q115,210 120,200" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M120,240 Q140,220 160,230 L180,245 Q175,260 155,265 L135,260 Q115,250 120,240" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M80,200 Q100,180 120,190 L140,205 Q135,220 115,225 L95,220 Q75,210 80,200" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M80,240 Q100,220 120,230 L140,245 Q135,260 115,265 L95,260 Q75,250 80,240" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M40,220 Q60,200 80,210 L100,225 Q95,240 75,245 L55,240 Q35,230 40,220" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M240,220 Q260,200 280,210 L300,225 Q295,240 275,245 L255,240 Q235,230 240,220" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M280,220 Q300,200 320,210 L340,225 Q335,240 315,245 L295,240 Q275,230 280,220" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M320,220 Q340,200 360,210 L380,225 Q375,240 355,245 L335,240 Q315,230 320,220" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M360,220 Q380,200 400,210 L410,225 Q405,240 385,245 L365,240 Q345,230 360,220" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M240,260 Q260,240 280,250 L300,265 Q295,280 275,285 L255,280 Q235,270 240,260" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <path d="M280,260 Q300,240 320,250 L340,265 Q335,280 315,285 L295,280 Q275,270 280,260" fill="#E8DCC8" stroke="#8B6914" stroke-width="0.5"/>
+            <ellipse cx="240" cy="150" rx="80" ry="60" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="240" cy="200" rx="60" ry="50" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="300" cy="120" rx="40" ry="30" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="180" cy="100" rx="50" ry="40" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="140" cy="160" rx="60" ry="50" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="200" cy="230" rx="70" ry="40" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="340" cy="180" rx="50" ry="40" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="100" cy="210" rx="40" ry="35" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <ellipse cx="60" cy="150" rx="30" ry="40" fill="none" stroke="#8B6914" stroke-width="1.5" stroke-dasharray="5,3"/>
+          </svg>
         </div>
-        
+
         <div class="map-legend">
           <div class="legend-item">
             <span class="legend-dot ancient"></span>
@@ -350,7 +530,7 @@
         </div>
       </div>
 
-      <div class="region-list" id="mapSection">
+      <div class="region-list">
         <div class="region-title">📍 各地建筑分布</div>
         <div class="region-tabs">
           <div class="region-tab active" data-region="all">全部</div>
@@ -372,6 +552,14 @@
         <div class="region-content" id="region-东北"></div>
         <div class="region-content" id="region-华南"></div>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="cityModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitle">城市建筑家</div>
+      <div id="modalContent"></div>
+      <button class="modal-close" onclick="closeModal()">关闭</button>
     </div>
   </div>
 
@@ -401,47 +589,141 @@
   <script src="js/data.js"></script>
   <script>
     const locationData = [
-      { name: '鲁班', dynasty: '春秋', location: '山东曲阜', region: '华东', city: '曲阜' },
-      { name: '李冰', dynasty: '战国', location: '四川成都', region: '西南', city: '成都' },
-      { name: '蒙恬', dynasty: '秦', location: '陕西咸阳', region: '西北', city: '咸阳' },
-      { name: '张骞', dynasty: '汉', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '张衡', dynasty: '东汉', location: '河南南阳', region: '华中', city: '南阳' },
-      { name: '马钧', dynasty: '三国', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '宇文恺', dynasty: '隋', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '李春', dynasty: '隋', location: '河北赵县', region: '华北', city: '石家庄' },
-      { name: '阎立德', dynasty: '唐', location: '陕西西安', region: '西北', city: '西安' },
-      { name: '喻皓', dynasty: '五代', location: '浙江杭州', region: '华东', city: '杭州' },
-      { name: '李诫', dynasty: '北宋', location: '河南开封', region: '华中', city: '开封' },
-      { name: '沈括', dynasty: '北宋', location: '浙江杭州', region: '华东', city: '杭州' },
-      { name: '张择端', dynasty: '北宋', location: '山东潍坊', region: '华东', city: '潍坊' },
-      { name: '李嵩', dynasty: '南宋', location: '浙江杭州', region: '华东', city: '杭州' },
-      { name: '郭守敬', dynasty: '元', location: '北京', region: '华北', city: '北京' },
-      { name: '蒯祥', dynasty: '明', location: '北京', region: '华北', city: '北京' },
-      { name: '计成', dynasty: '明', location: '江苏苏州', region: '华东', city: '苏州' },
-      { name: '文震亨', dynasty: '明', location: '江苏苏州', region: '华东', city: '苏州' },
-      { name: '徐光启', dynasty: '明', location: '上海', region: '华东', city: '上海' },
-      { name: '宋应星', dynasty: '明', location: '江西宜春', region: '华东', city: '宜春' },
-      { name: '雷发达', dynasty: '清', location: '北京', region: '华北', city: '北京' },
-      { name: '雷金玉', dynasty: '清', location: '北京', region: '华北', city: '北京' },
-      { name: '姚承祖', dynasty: '清', location: '江苏苏州', region: '华东', city: '苏州' },
-      { name: '梁思成', dynasty: '现代', location: '北京', region: '华北', city: '北京' },
-      { name: '林徽因', dynasty: '现代', location: '北京', region: '华北', city: '北京' },
-      { name: '柳宗元', dynasty: '唐', location: '山西运城', region: '华北', city: '运城' },
-      { name: '刘禹锡', dynasty: '唐', location: '河南洛阳', region: '华中', city: '洛阳' },
-      { name: '王维', dynasty: '唐', location: '山西太原', region: '华北', city: '太原' },
-      { name: '白居易', dynasty: '唐', location: '陕西渭南', region: '西北', city: '渭南' },
-      { name: '蒋少游', dynasty: '北魏', location: '山东博兴', region: '华东', city: '滨州' },
-      { name: '张涟', dynasty: '明末清初', location: '江苏松江', region: '华东', city: '上海' },
-      { name: '李渔', dynasty: '明末清初', location: '浙江兰溪', region: '华东', city: '金华' },
-      { name: '雷思起', dynasty: '清', location: '北京', region: '华北', city: '北京' },
-      { name: '雷献彩', dynasty: '清', location: '北京', region: '华北', city: '北京' },
-      { name: '陈明达', dynasty: '现代', location: '湖南长沙', region: '华中', city: '长沙' },
-      { name: '刘敦桢', dynasty: '现代', location: '湖南新宁', region: '华中', city: '邵阳' },
-      { name: '朱启钤', dynasty: '现代', location: '贵州开州', region: '西南', city: '贵阳' },
-      { name: '雷金鸣', dynasty: '清', location: '北京', region: '华北', city: '北京' },
-      { name: '阮安', dynasty: '明', location: '北京', region: '华北', city: '北京' },
-      { name: '阮元', dynasty: '清', location: '江苏仪征', region: '华东', city: '扬州' }
+      { name: '鲁班', dynasty: '春秋', location: '山东曲阜', region: '华东', city: '曲阜', x: 260, y: 120 },
+      { name: '李冰', dynasty: '战国', location: '四川成都', region: '西南', city: '成都', x: 160, y: 220 },
+      { name: '蒙恬', dynasty: '秦', location: '陕西咸阳', region: '西北', city: '咸阳', x: 180, y: 140 },
+      { name: '张骞', dynasty: '汉', location: '陕西西安', region: '西北', city: '西安', x: 185, y: 135 },
+      { name: '张衡', dynasty: '东汉', location: '河南南阳', region: '华中', city: '南阳', x: 230, y: 175 },
+      { name: '马钧', dynasty: '三国', location: '陕西西安', region: '西北', city: '西安', x: 185, y: 135 },
+      { name: '宇文恺', dynasty: '隋', location: '陕西西安', region: '西北', city: '西安', x: 185, y: 135 },
+      { name: '李春', dynasty: '隋', location: '河北赵县', region: '华北', city: '石家庄', x: 250, y: 100 },
+      { name: '阎立德', dynasty: '唐', location: '陕西西安', region: '西北', city: '西安', x: 185, y: 135 },
+      { name: '喻皓', dynasty: '五代', location: '浙江杭州', region: '华东', city: '杭州', x: 300, y: 180 },
+      { name: '李诫', dynasty: '北宋', location: '河南开封', region: '华中', city: '开封', x: 240, y: 160 },
+      { name: '沈括', dynasty: '北宋', location: '浙江杭州', region: '华东', city: '杭州', x: 300, y: 180 },
+      { name: '张择端', dynasty: '北宋', location: '山东潍坊', region: '华东', city: '潍坊', x: 270, y: 115 },
+      { name: '李嵩', dynasty: '南宋', location: '浙江杭州', region: '华东', city: '杭州', x: 300, y: 180 },
+      { name: '郭守敬', dynasty: '元', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '蒯祥', dynasty: '明', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '计成', dynasty: '明', location: '江苏苏州', region: '华东', city: '苏州', x: 290, y: 165 },
+      { name: '文震亨', dynasty: '明', location: '江苏苏州', region: '华东', city: '苏州', x: 290, y: 165 },
+      { name: '徐光启', dynasty: '明', location: '上海', region: '华东', city: '上海', x: 310, y: 160 },
+      { name: '宋应星', dynasty: '明', location: '江西宜春', region: '华东', city: '宜春', x: 280, y: 200 },
+      { name: '雷发达', dynasty: '清', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '雷金玉', dynasty: '清', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '姚承祖', dynasty: '清', location: '江苏苏州', region: '华东', city: '苏州', x: 290, y: 165 },
+      { name: '梁思成', dynasty: '现代', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '林徽因', dynasty: '现代', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '柳宗元', dynasty: '唐', location: '山西运城', region: '华北', city: '运城', x: 220, y: 120 },
+      { name: '刘禹锡', dynasty: '唐', location: '河南洛阳', region: '华中', city: '洛阳', x: 225, y: 150 },
+      { name: '王维', dynasty: '唐', location: '山西太原', region: '华北', city: '太原', x: 235, y: 110 },
+      { name: '白居易', dynasty: '唐', location: '陕西渭南', region: '西北', city: '渭南', x: 195, y: 145 },
+      { name: '蒋少游', dynasty: '北魏', location: '山东博兴', region: '华东', city: '滨州', x: 265, y: 110 },
+      { name: '张涟', dynasty: '明末清初', location: '江苏松江', region: '华东', city: '上海', x: 310, y: 160 },
+      { name: '李渔', dynasty: '明末清初', location: '浙江兰溪', region: '华东', city: '金华', x: 295, y: 190 },
+      { name: '雷思起', dynasty: '清', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '雷献彩', dynasty: '清', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '陈明达', dynasty: '现代', location: '湖南长沙', region: '华中', city: '长沙', x: 260, y: 220 },
+      { name: '刘敦桢', dynasty: '现代', location: '湖南新宁', region: '华中', city: '邵阳', x: 255, y: 230 },
+      { name: '朱启钤', dynasty: '现代', location: '贵州开州', region: '西南', city: '贵阳', x: 200, y: 240 },
+      { name: '雷金鸣', dynasty: '清', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '阮安', dynasty: '明', location: '北京', region: '华北', city: '北京', x: 270, y: 80 },
+      { name: '阮元', dynasty: '清', location: '江苏仪征', region: '华东', city: '扬州', x: 275, y: 155 }
     ];
+
+    function getDynastyClass(dynasty) {
+      if (['春秋', '战国', '秦', '汉', '东汉', '三国', '北魏'].includes(dynasty)) return 'ancient';
+      if (['隋', '唐', '五代'].includes(dynasty)) return 'tang';
+      if (['北宋', '南宋', '元'].includes(dynasty)) return 'song';
+      if (['明', '明末清初'].includes(dynasty)) return 'ming';
+      if (['清'].includes(dynasty)) return 'qing';
+      return 'modern';
+    }
+
+    function createCityMarkers() {
+      const map = document.getElementById('chinaMap');
+      const cityGroups = {};
+      
+      locationData.forEach(item => {
+        if (!cityGroups[item.city]) {
+          cityGroups[item.city] = { x: item.x, y: item.y, count: 0, dynasty: item.dynasty, items: [] };
+        }
+        cityGroups[item.city].count++;
+        cityGroups[item.city].items.push(item);
+      });
+
+      Object.keys(cityGroups).forEach(city => {
+        const info = cityGroups[city];
+        const marker = document.createElement('div');
+        marker.className = `city-marker ${getDynastyClass(info.dynasty)}`;
+        marker.style.left = `${(info.x / 400) * 100}%`;
+        marker.style.top = `${(info.y / 300) * 100}%`;
+        marker.style.transform = 'translate(-50%, -50%)';
+        
+        marker.onmouseenter = function(e) {
+          showTooltip(e, city, info.count);
+        };
+        
+        marker.onmouseleave = function() {
+          hideTooltip();
+        };
+        
+        marker.onclick = function() {
+          showCityModal(city, info.items);
+        };
+        
+        map.appendChild(marker);
+      });
+    }
+
+    function showTooltip(e, city, count) {
+      let tooltip = document.getElementById('cityTooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'cityTooltip';
+        tooltip.className = 'city-tooltip';
+        document.body.appendChild(tooltip);
+      }
+      
+      tooltip.innerHTML = `<span class="tooltip-city">${city}</span><span class="tooltip-count">${count}位建筑家</span>`;
+      tooltip.style.left = `${e.clientX + 10}px`;
+      tooltip.style.top = `${e.clientY - 50}px`;
+      tooltip.classList.add('visible');
+    }
+
+    function hideTooltip() {
+      const tooltip = document.getElementById('cityTooltip');
+      if (tooltip) {
+        tooltip.classList.remove('visible');
+      }
+    }
+
+    function showCityModal(city, items) {
+      const modal = document.getElementById('cityModal');
+      const title = document.getElementById('modalTitle');
+      const content = document.getElementById('modalContent');
+      
+      title.textContent = `${city} - 建筑家`;
+      
+      const uniqueItems = [...new Map(items.map(item => [item.name, item])).values()];
+      
+      content.innerHTML = uniqueItems.map(item => `
+        <div class="modal-architect-item" onclick="window.location.href='detail.html?name=${encodeURIComponent(item.name)}'">
+          <div class="modal-avatar">${item.name[0]}</div>
+          <div class="modal-info">
+            <div class="modal-name">${item.name}</div>
+            <div class="modal-dynasty">${item.dynasty} · ${item.location}</div>
+          </div>
+        </div>
+      `).join('');
+      
+      modal.classList.add('visible');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('cityModal');
+      modal.classList.remove('visible');
+    }
 
     const regionGroups = {
       'all': locationData,
@@ -471,48 +753,48 @@
       
       let html = '';
       
-      html += '<div class="city-grid">';
-      Object.entries(cityCounts).forEach(([city, count]) => {
-        html += `
-          <div class="city-item" onclick="showCityArchitects('${city}')">
-            <div class="city-name">${city}</div>
-            <div class="city-count">${count}位建筑家</div>
-          </div>
-        `;
-      });
-      html += '</div>';
+      if (Object.keys(cityCounts).length > 0) {
+        html += '<div class="city-grid">';
+        Object.entries(cityCounts).forEach(([city, count]) => {
+          html += `
+            <div class="city-item" onclick="showCityArchitects('${city}')">
+              <div class="city-name">${city}</div>
+              <div class="city-count">${count}位建筑家</div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
       
-      html += '<div style="margin-top: 20px;">';
-      html += '<div style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">建筑家列表</div>';
-      html += uniqueItems.map(item => `
-        <a href="detail.html?name=${encodeURIComponent(item.name)}" class="architect-map-card">
-          <div class="architect-map-avatar">${item.name[0]}</div>
-          <div class="architect-map-info">
-            <div class="architect-map-name">${item.name}</div>
-            <div class="architect-map-location">📍 ${item.location} · ${item.dynasty}</div>
-          </div>
-          <span class="architect-map-link">查看 ›</span>
-        </a>
-      `).join('');
-      html += '</div>';
+      if (uniqueItems.length > 0) {
+        html += '<div style="margin-top: 15px;">';
+        html += '<div style="font-size: 13px; font-weight: 600; color: #5D3A1A; margin-bottom: 10px;">建筑家列表</div>';
+        html += uniqueItems.map(item => `
+          <a href="detail.html?name=${encodeURIComponent(item.name)}" class="architect-map-card">
+            <div class="architect-map-avatar">${item.name[0]}</div>
+            <div class="architect-map-info">
+              <div class="architect-map-name">${item.name}</div>
+              <div class="architect-map-location">📍 ${item.location} · ${item.dynasty}</div>
+            </div>
+            <span class="architect-map-link">查看 ›</span>
+          </a>
+        `).join('');
+        html += '</div>';
+      } else {
+        html += '<div class="empty-state" style="padding: 30px;">暂无数据</div>';
+      }
       
       container.innerHTML = html;
     }
 
     function showCityArchitects(city) {
       const cityArchitects = locationData.filter(item => item.city === city);
-      const uniqueNames = [...new Set(cityArchitects.map(item => item.name))];
-      
-      if (uniqueNames.length > 0) {
-        alert(`${city}：收录 ${uniqueNames.length} 位建筑家\n${uniqueNames.join('、')}`);
-      } else {
-        alert(`${city}：暂无收录的建筑家`);
+      if (cityArchitects.length > 0) {
+        showCityModal(city, cityArchitects);
       }
     }
 
-    function scrollToMap() {
-      document.getElementById('mapSection').scrollIntoView({ behavior: 'smooth' });
-    }
+    createCityMarkers();
 
     Object.keys(regionGroups).forEach(region => {
       renderRegionList(region);
@@ -527,6 +809,12 @@
         const region = this.dataset.region;
         document.getElementById(`region-${region}`).classList.add('active');
       });
+    });
+
+    document.getElementById('cityModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
     });
   </script>
 </body>
